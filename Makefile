@@ -1,4 +1,4 @@
-#WARNINGS = -Wall -Wextra
+WARNINGS = -Wall -Wextra -Wextra
 
 all: sshell
 
