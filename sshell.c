@@ -6,7 +6,7 @@
 #define CMDLINE_MAX 512
 
 int main(void)
-{
+{       
         char cmd[CMDLINE_MAX];
 
         while (1) {
@@ -44,4 +44,4 @@ int main(void)
         }
 
         return EXIT_SUCCESS;
-}}
+}
