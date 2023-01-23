@@ -6,6 +6,16 @@
 
 #define CMDLINE_MAX 512
 
+/*
+char **splitter(char *buf);
+
+char **splitter(char *buf) {
+    while (*buf) {
+
+    }
+}
+*/
+
 int main(void)
 {       
     char cmd[CMDLINE_MAX];
@@ -45,7 +55,7 @@ int main(void)
         pid = fork();
 
         if (pid == 0) {
-            char *cmd_args[] = {cmd, NULL};
+            char *cmd_args[] = {cmd, "-l", NULL};
             execvp(cmd, cmd_args);
             perror("execv");
             exit(1);

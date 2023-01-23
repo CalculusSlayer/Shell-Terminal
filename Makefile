@@ -1,12 +1,24 @@
+# Makefile
+
 WARNINGS = -Wall -Wextra -Wextra
+DEBUG =
+DEBUG += -g
+EXEC1 = sshell
+EXEC2 = token
 
-all: sshell
+all: $(EXEC1) $(EXEC2)
 
-sshell: sshell.o
-	gcc $(WARNINGS) -o sshell sshell.o
+$(EXEC1): $(EXEC1).o
+	gcc $(WARNINGS) -o $(EXEC1) $(EXEC1).o $(DEBUG)
 
-sshell.o: sshell.c
-	gcc $(WARNINGS) -c sshell.c
+$(EXEC1).o: $(EXEC1).c
+	gcc $(WARNINGS) -c $(EXEC1).c $(DEBUG)
+
+$(EXEC2): $(EXEC2).o
+	gcc $(WARNINGS) -o $(EXEC2) $(EXEC2).o $(DEBUG)
+
+$(EXEC2).o: $(EXEC2).c
+	gcc $(WARNINGS) -c $(EXEC2).c $(DEBUG)
 
 clean:
-	rm -f *.o sshell
+	rm -f *.o $(EXEC1) $(EXEC2)
