@@ -4,17 +4,10 @@
 #include <unistd.h>
 #include <sys/wait.h>
 
+#include "token.h"
+
 #define CMDLINE_MAX 512
 
-/*
-char **splitter(char *buf);
-
-char **splitter(char *buf) {
-    while (*buf) {
-
-    }
-}
-*/
 
 int main(void)
 {       
@@ -55,9 +48,11 @@ int main(void)
         pid = fork();
 
         if (pid == 0) {
-            char *cmd_args[] = {cmd, "-l", NULL};
+            char **cmd_args = splitter(cmd);
+            //char *cmd_args[] = {cmd, "-l", NULL};
             execvp(cmd, cmd_args);
             perror("execv");
+            deallocator(&cmd_args);
             exit(1);
         }
         else if (pid > 0) {
