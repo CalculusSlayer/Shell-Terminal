@@ -37,8 +37,9 @@ void deallocator(char ***buf) {
     *buf = NULL;
 }
 
-
+/*
 int main() {
+*/
     /*
     char **cmd_args = malloc(sizeof(char*) * 16);
 
@@ -62,6 +63,7 @@ int main() {
     }
     */
 
+/*
     char str[] = "ls -l -x -x -f";
     char **x = splitter(str);
     // char * ptr = *x
@@ -74,3 +76,4 @@ int main() {
 
     return 0;
 }
+*/
