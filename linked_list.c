@@ -1,33 +1,31 @@
-// LinkedList.c
+// linked_list.c
 // Linked List of strings class
-#include <stdlib.h>
-#include <string.h>
 
-#include "LinkedList.h"
+#include "linked_list.h"
 
 // Private Node struct
-typdef struct *NodeObj Node;
+typedef struct NodeObj* Node;
 
 // Private NodeObj struct
-typedef struct {
+typedef struct NodeObj{
     char* val;
     Node next;
 } NodeObj;
 
 // Private LinkedListObj struct
-typedef struct {
+typedef struct LinkedListObj{
     Node head;
     Node tail;
     int length;
 } LinkedListObj;
 
-// newNode()
+// newNode() - private function
 // Returns a reference to new Node object
-Node newNode(string val) {
+Node newNode(char* val) {
     Node N = malloc(sizeof(NodeObj));
     if (!N) {
-        fprintf(stderr, "Could not allocate
-                memory for Node\n");
+        fprintf(stderr, "Could not allocate "
+                "memory for Node\n");
         exit(EXIT_FAILURE);
     }
     N->val = strdup(val);
@@ -35,10 +33,11 @@ Node newNode(string val) {
     return N;
 }
 
-// freeNode()
+// freeNode() - private function
 // Frees Node object.
-void freeNode(*Node pN) {
+void freeNode(Node* pN) {
     if (pN != NULL && *pN != NULL) {
+        free((*pN)->val);
         free(*pN);
         *pN = NULL;
     }
@@ -50,8 +49,8 @@ void freeNode(*Node pN) {
 LinkedList newLinkedList() {
     LinkedList L = malloc(sizeof(LinkedListObj));
     if (!L) {
-        fprintf(stderr, "Could not allocate
-                memory for LinkedList\n");
+        fprintf(stderr, "Could not allocate"
+                "memory for LinkedList\n");
         exit(EXIT_FAILURE);
     }
     L->head = NULL;
@@ -63,7 +62,7 @@ LinkedList newLinkedList() {
 // freeLinkedList()
 // Frees all memory allocated for Linked List
 // including memory for the individual nodes.
-void freeLinkedList(*pL) {
+void freeLinkedList(LinkedList* pL) {
     if (pL != NULL && *pL != NULL) {
         while (!isEmpty(*pL)) {
             popLeft(*pL);
@@ -97,11 +96,11 @@ bool isEmpty(LinkedList L) {
     return (getLength(L)==0);
 }
 
-// Append()
-// Append string to Linked List
-void Append(LinkedList L, string val) {
+// appendRight()
+// Append string to end of Linked List
+void appendRight(LinkedList L, char* val) {
     if (!L) {
-        fprintf(stderr, "Calling Append() on NULL reference\n");
+        fprintf(stderr, "Calling appendRight() on NULL reference\n");
         exit(EXIT_FAILURE);
     }
     Node N = newNode(val);
@@ -122,8 +121,8 @@ void popLeft(LinkedList L) {
         exit(EXIT_FAILURE);
     }
     if (isEmpty(L)) {
-        fprintf(stderr, "Linked List is empty. Cannot call popLeft()
-                on an empty Linked List\n");
+        fprintf(stderr, "Linked List is empty. Cannot call popLeft()"
+                "on an empty Linked List\n");
         exit(EXIT_FAILURE);
     }
 
@@ -140,13 +139,13 @@ void popLeft(LinkedList L) {
         
 }
 
-void printLinkedList(LinkedList L, FILE *fileStream) {
+void printLinkedList(FILE *fileStream, LinkedList L) {
     if (!L) {
         fprintf(stderr, "Calling printLinkedList() on NULL reference\n");
         exit(EXIT_FAILURE);
     }
 
-    for (Node N = L->head; N != NULL; N->next) {
+    for (Node N = L->head; N != NULL; N = N->next) {
         fprintf(fileStream, "%s", N->val);
         if (N != L->tail)
             fprintf(fileStream, " ");

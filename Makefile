@@ -6,7 +6,7 @@ CFLAGS += -g
 EXEC1 = sshell
 DEPENDENCIES = token.o
 
-all: $(EXEC1) token_test
+all: $(EXEC1) token_test linked_list_test
 
 $(EXEC1): $(EXEC1).o $(DEPENDENCIES)
 	gcc $(CFLAGS) -o $(EXEC1) $(EXEC1).o $(DEPENDENCIES)
@@ -23,11 +23,13 @@ token_test: token_test.o token.o
 token_test.o: token_test.c token.h
 	gcc $(CFLAGS) -c token_test.c
 
-#$(EXEC2): $(EXEC2).o
-#	gcc $(WARNINGS) -o $(EXEC2) $(EXEC2).o $(DEBUG)
+linked_list_test: linked_list_test.o linked_list.o
+	gcc $(CFLAGS) -o linked_list_test linked_list_test.o linked_list.o
 
-#$(EXEC2).o: $(EXEC2).c
-#	gcc $(WARNINGS) -c $(EXEC2).c $(DEBUG)
+linked_list_test.o: linked_list_test.c linked_list.h
+	gcc $(CFLAGS) -c linked_list_test.c
 
+linked_list.o: linked_list.c linked_list.h
+	gcc $(CFLAGS) -c linked_list.c
 clean:
-	rm -f *.o $(EXEC1) token_test
+	rm -f *.o $(EXEC1) token_test linked_list_test
