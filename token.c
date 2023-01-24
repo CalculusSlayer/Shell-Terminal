@@ -4,11 +4,12 @@
 
 char **splitter(char *buf) {
     char **cmd_args = calloc(16, sizeof(char*));
-
+    char *buf_copy = strdup(buf);    
+    // Need to make copy of buf
     char *token = NULL;
     const char delimiter[] = " ";
 
-    token = strtok(buf, delimiter);
+    token = strtok(buf_copy, delimiter);
 
     /*
     while (token != NULL) {
@@ -22,9 +23,9 @@ char **splitter(char *buf) {
             cmd_args_index++) {
         //printf("%s\n", token);
         cmd_args[cmd_args_index] = strdup(token);
-        token = strtok(NULL, delimiter);
+        token = strtok(0, delimiter);
     }
-
+    free(buf_copy);
     return cmd_args;
 }
 

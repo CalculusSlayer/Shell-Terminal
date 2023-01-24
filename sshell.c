@@ -53,14 +53,14 @@ int main(void)
             //char *cmd_args[] = {cmd, "-l", NULL};
             execvp(cmd_args[0], cmd_args);
             perror("execv");
-            // deallocator(&cmd_args);
+            deallocator(&cmd_args);
             exit(1);
         }
         else if (pid > 0) {
             int status;
             waitpid(pid, &status, 0);
             // TODO: Remove the print statement below.
-            printf("+ completed '%s' [%d]\n", cmd_args[0],  WEXITSTATUS(status));
+            printf("+ completed '%s' [%d]\n", cmd,  WEXITSTATUS(status));
             deallocator(&cmd_args);
         }
         else {
