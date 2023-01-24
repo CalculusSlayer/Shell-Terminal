@@ -50,6 +50,7 @@ int main(void)
         /* Builtin command */
         if (!strcmp(cmd_args[0], "exit")) {
             fprintf(stderr, "Bye...\n");
+            fprintf(stderr, "+ completed '%s' [%d]\n", "exit", 0);
             break;
         }
         else if (!strcmp(cmd_args[0], "pwd")) {
