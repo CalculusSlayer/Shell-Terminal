@@ -8,6 +8,9 @@ void deallocator(char ***buf);
 
 typedef struct {
     char *cmd;
-    char **args;
+    // change type to linked list
+    char **args1;
+    char **args2;
+    // add file operation type
 } Process;
 

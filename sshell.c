@@ -9,16 +9,16 @@
 #include <dirent.h>
 
 #define CMDLINE_MAX 512
-#define TOKEN_LENGTH_MAX 33
+#define TOKEN_LENGTH_MAX 32 // 32 + 1 to make space for NULL character
 
 //Referenced slide deck 03(syscalls) for information regarding readdir();
 
 int main(void)
 {       
     char cmd[CMDLINE_MAX];
-    char current_directory[TOKEN_LENGTH_MAX];
+    char current_directory[100];
     DIR *dirp;
-    struct dirent *dp;
+    //struct dirent *dp;
 
     while (1) {
         char *nl; 
@@ -53,7 +53,9 @@ int main(void)
             fprintf(stderr, "+ completed '%s' [%d]\n", "exit", 0);
             break;
         }
+        //TODO: Debug pwd. It is failing test.sh.
         else if (!strcmp(cmd_args[0], "pwd")) {
+            // Maybe add error checking if getcwd() fails.
             getcwd(current_directory, sizeof(current_directory));
             printf("%s\n", current_directory);         
             fprintf(stderr, "+ completed '%s' [%d]\n", cmd, 0);
@@ -62,7 +64,10 @@ int main(void)
         else if (!strcmp(cmd_args[0], "cd")) {
             //TODO: CHeck to see if provided directory is valid
             
-            bool directory_found = false;
+            int directory_not_found = 1;
+            dirp = opendir(cmd_args[1]);
+            
+            /*
             dirp = opendir(".");
             while ((dp = readdir(dirp)) != NULL) 
             {
@@ -72,11 +77,18 @@ int main(void)
                     break;
                 }
             }
-            if (!directory_found) {
-                fprintf(stderr, "Error: could not change directories.\n");
+            */
+            // Directory was successfully found
+            if (dirp) {
+                chdir(cmd_args[1]);
+                directory_not_found = 0;
             }
+            else
+                fprintf(stderr, "Error: could not change directories.\n");
 
-            fprintf(stderr, "+ completed '%s %s' [%d]\n", cmd_args[0], cmd_args[1], 0);
+
+            fprintf(stderr, "+ completed '%s %s' [%d]\n", cmd_args[0], cmd_args[1], directory_not_found);
+            closedir(dirp);
             continue;
         }
 
@@ -84,11 +96,15 @@ int main(void)
         //TODO:
         //PWD and CD builtin commands
 
-
+        //TODO: Check if this is the correct error message.
+        //Doesn't this mean that there were no cmd_args?
+        /*
         if (cmd_args == NULL) {
             printf("Error: too many process arguments\n");
             continue;
         }
+        */
+
         // Use execvp()
         /* Regular command */
         pid_t pid;
