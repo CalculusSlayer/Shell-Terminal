@@ -18,7 +18,6 @@ int main(void)
         //int retval;
 
         /* Print prompt */
-        // Added '@ucd'
         printf("sshell@ucd$ ");
         fflush(stdout);
 
@@ -41,12 +40,20 @@ int main(void)
             fprintf(stderr, "Bye...\n");
             break;
         }
-        
+        //TODO:
+        //PWD and CD builtin commands
+
+
         char **cmd_args = splitter(cmd);
+        if (cmd_args == NULL) {
+            printf("Error: too many process arguments\n");
+            continue;
+        }
         // Use execvp()
         /* Regular command */
         pid_t pid;
         pid = fork();
+
 
         if (pid == 0) {
             //char **cmd_args = splitter(cmd);
