@@ -45,6 +45,8 @@ void freeNode(*Node pN) {
 }
 
 // newLinkedList()
+// Allocates memory for a new Linked List
+// and creates a reference for it.
 LinkedList newLinkedList() {
     LinkedList L = malloc(sizeof(LinkedListObj));
     if (!L) {
@@ -59,6 +61,17 @@ LinkedList newLinkedList() {
 }
 
 // freeLinkedList()
+// Frees all memory allocated for Linked List
+// including memory for the individual nodes.
+void freeLinkedList(*pL) {
+    if (pL != NULL && *pL != NULL) {
+        while (!isEmpty(*pL)) {
+            popLeft(*pL);
+        }
+        free(*pL);
+        *pL = NULL;
+    }
+}
 
 
 // getLength()
@@ -103,4 +116,42 @@ void Append(LinkedList L, string val) {
     L->length++;
 }
 
+void popLeft(LinkedList L) {
+    if (!L) {
+        fprintf(stderr, "Calling popLeft() on NULL reference\n");
+        exit(EXIT_FAILURE);
+    }
+    if (isEmpty(L)) {
+        fprintf(stderr, "Linked List is empty. Cannot call popLeft()
+                on an empty Linked List\n");
+        exit(EXIT_FAILURE);
+    }
+
+    Node N = L->head;
+    if (getLength(L) > 1) {
+        L->head = L->head->next;
+    }
+    else {
+        L->head = L->tail = NULL;
+    }
+
+    L->length--;
+    freeNode(&N);
+        
+}
+
+void printLinkedList(LinkedList L, FILE *fileStream) {
+    if (!L) {
+        fprintf(stderr, "Calling printLinkedList() on NULL reference\n");
+        exit(EXIT_FAILURE);
+    }
+
+    for (Node N = L->head; N != NULL; N->next) {
+        fprintf(fileStream, "%s", N->val);
+        if (N != L->tail)
+            fprintf(fileStream, " ");
+    }
+
+    fprintf(fileStream, "\n");
+}
 
