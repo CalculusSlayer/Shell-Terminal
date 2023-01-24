@@ -2,7 +2,36 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "token.h"
+
 const int MAX_ARGUMENTS = 16;
+Process* pipes[4];
+
+/*
+int sshell_exec(Process *p) {
+    return 0;
+}
+*/
+
+char** split_pipes(char *cmd_line) {
+    char **pipe_array = calloc(4, sizeof(char*));
+    char *cmd_line_copy = strdup(cmd_line);
+    char *token = NULL;
+    const char delimiter[] = "|";
+
+    token = strtok(cmd_line_copy, delimiter);
+    int pipe_array_index = 0;
+    do {
+        printf("%d, %s\n", pipe_array_index, token);
+        pipe_array[pipe_array_index] = strdup(token);
+        token = strtok(NULL, delimiter);
+        pipe_array_index++;
+    } while (token);
+    
+    free(cmd_line_copy);
+    return pipe_array;
+
+}
 
 char **splitter(char *buf) {
     char **cmd_args = calloc(MAX_ARGUMENTS, sizeof(char*));
