@@ -21,8 +21,9 @@ typedef enum File_Operator {
 } File_Operator;
 
 typedef struct Process {
-    char *cmd;
+    char *program;
     File_Operator FO_type;
+    bool background_job;
     // change type to linked list
     LinkedList left_args;
     LinkedList right_args;
