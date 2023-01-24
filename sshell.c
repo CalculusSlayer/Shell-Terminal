@@ -59,8 +59,9 @@ int main(void)
         else if (pid > 0) {
             int status;
             waitpid(pid, &status, 0);
-            // TODO: Remove the print statement below.
-            printf("+ completed '%s' [%d]\n", cmd,  WEXITSTATUS(status));
+            // Printing to stderr instead of stdout now. Instructions
+            // said to print to stderr.
+            fprintf(stderr, "+ completed '%s' [%d]\n", cmd,  WEXITSTATUS(status));
             deallocator(&cmd_args);
         }
         else {
