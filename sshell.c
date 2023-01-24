@@ -42,24 +42,26 @@ int main(void)
             break;
         }
         
+        char **cmd_args = splitter(cmd);
         // Use execvp()
         /* Regular command */
         pid_t pid;
         pid = fork();
 
         if (pid == 0) {
-            char **cmd_args = splitter(cmd);
+            //char **cmd_args = splitter(cmd);
             //char *cmd_args[] = {cmd, "-l", NULL};
-            execvp(cmd, cmd_args);
+            execvp(cmd_args[0], cmd_args);
             perror("execv");
-            deallocator(&cmd_args);
+            // deallocator(&cmd_args);
             exit(1);
         }
         else if (pid > 0) {
             int status;
             waitpid(pid, &status, 0);
             // TODO: Remove the print statement below.
-            printf("Child returned %d\n", WEXITSTATUS(status));
+            printf("+ completed '%s' [%d]\n", cmd_args[0],  WEXITSTATUS(status));
+            deallocator(&cmd_args);
         }
         else {
             perror("fork");
