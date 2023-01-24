@@ -5,16 +5,24 @@
 #include <sys/wait.h>
 
 #include "token.h"
+#include <stdbool.h>
+#include <dirent.h>
 
 #define CMDLINE_MAX 512
+#define TOKEN_LENGTH_MAX 33
 
+//Referenced slide deck 03(syscalls) for information regarding readdir();
 
 int main(void)
 {       
     char cmd[CMDLINE_MAX];
+    char current_directory[TOKEN_LENGTH_MAX];
+    DIR *dirp;
+    struct dirent *dp;
 
     while (1) {
-        char *nl;
+        char *nl; 
+
         //int retval;
 
         /* Print prompt */
@@ -30,21 +38,52 @@ int main(void)
             fflush(stdout);
         }
 
+
         /* Remove trailing newline from command line */
         nl = strchr(cmd, '\n');
         if (nl)
             *nl = '\0';
+        
+
+        char **cmd_args = splitter(cmd);
 
         /* Builtin command */
-        if (!strcmp(cmd, "exit")) {
+        if (!strcmp(cmd_args[0], "exit")) {
             fprintf(stderr, "Bye...\n");
             break;
         }
+        else if (!strcmp(cmd_args[0], "pwd")) {
+            getcwd(current_directory, sizeof(current_directory));
+            printf("%s\n", current_directory);         
+            fprintf(stderr, "+ completed '%s' [%d]\n", cmd, 0);
+            continue;
+        }
+        else if (!strcmp(cmd_args[0], "cd")) {
+            //TODO: CHeck to see if provided directory is valid
+            
+            bool directory_found = false;
+            dirp = opendir(".");
+            while ((dp = readdir(dirp)) != NULL) 
+            {
+                if (!strcmp(dp->d_name, cmd_args[1])) {
+                    directory_found = true;
+                    chdir(cmd_args[1]);
+                    break;
+                }
+            }
+            if (!directory_found) {
+                fprintf(stderr, "Error: could not change directories.\n");
+            }
+
+            fprintf(stderr, "+ completed '%s %s' [%d]\n", cmd_args[0], cmd_args[1], 0);
+            continue;
+        }
+
+
         //TODO:
         //PWD and CD builtin commands
 
 
-        char **cmd_args = splitter(cmd);
         if (cmd_args == NULL) {
             printf("Error: too many process arguments\n");
             continue;
