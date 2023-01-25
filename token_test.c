@@ -24,6 +24,9 @@ int main() {
     deallocator(&x);
     deallocator(NULL);
     
+
+    // TODO: INITIALIZE PROCESS ARRAY OF SIZE 4
+    // IN sshell.c
     Process yy[4] = {NULL, NULL, NULL, NULL};
     for (int i = 0; i < 4; i++) {
         if (pipe_strings[i] == NULL) {
@@ -39,11 +42,21 @@ int main() {
         if (yy[i] != NULL) {
             printf("program - %s, FO_TYPE - %d\n", yy[i]->program, yy[i]->FO_type);
             printf("left_args = ");
-            printLinkedList(stdout, yy[i]->left_args);
+            if (yy[i]->left_args) {
+                printLinkedList(stdout, yy[i]->left_args);
+            }
             printf("right_args = ");
-            printLinkedList(stdout, yy[i]->right_args);
+            if (yy[i]->right_args) {
+                printLinkedList(stdout, yy[i]->right_args);
+            }
         }
     }
+    
+    for (int i = 0; i < 4; i++) {
+        sshell_system(yy[i]);
+    }
+
+
     deallocator(&pipe_strings);
 
     /*

@@ -171,13 +171,16 @@ void popLeft(LinkedList L) {
         
 }
 
-char** ll_to_str_arr(LinkedList L) {
-    char **ret = malloc(getLength(L) * sizeof(char*));
+char** ll_to_str_arr(LinkedList L, char* prog_name) {
+    char **ret = malloc((getLength(L)+2) * sizeof(char*));
     int ret_index = 0;
+    ret[ret_index] = prog_name; 
+    ret_index++;
     for (Node N = L->head; N; N = N->next) {
         ret[ret_index] = strdup(N->val);
         ret_index++;
     }
+    ret[ret_index] = NULL;
     return ret;
 }
 
@@ -216,6 +219,6 @@ void printLinkedList(FILE *fileStream, LinkedList L) {
             fprintf(fileStream, " ");
     }
 
-    fprintf(fileStream, "\n");
+    //fprintf(fileStream, "\n");
 }
 

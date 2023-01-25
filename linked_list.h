@@ -48,7 +48,7 @@ void popLeft(LinkedList L);
 
 // ll_to_str_arr()
 // Convert linked list into string array
-char** ll_to_str_arr(LinkedList L);
+char** ll_to_str_arr(LinkedList L, char*);
 
 // str_to_ll()
 // Convert str to linked list

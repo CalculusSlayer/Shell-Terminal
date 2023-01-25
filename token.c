@@ -165,10 +165,11 @@ void sshell_system(Process p) {
     pid_t child_pid;
     child_pid = fork();
 
-    char** cmd_args = ll_to_str_arr(p->left_args);
+    //char** cmd_args = ll_to_str_arr(p->left_args);
     if (child_pid == 0) {
         //char **cmd_args = splitter(cmd);
         //char *cmd_args[] = {cmd, "-l", NULL};
+        char** cmd_args = ll_to_str_arr(p->left_args, p->program);
         execvp(p->program, cmd_args);
         perror("execv");
         deallocator(&cmd_args);
