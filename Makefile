@@ -17,10 +17,10 @@ $(EXEC1).o: $(EXEC1).c token.h
 token.o: token.c token.h
 	gcc $(CFLAGS) -c token.c
 
-token_test: token_test.o token.o
-	gcc $(CFLAGS) -o token_test token_test.o token.o
+token_test: token_test.o token.o linked_list.o
+	gcc $(CFLAGS) -o token_test token_test.o token.o linked_list.o
 
-token_test.o: token_test.c token.h
+token_test.o: token_test.c token.h linked_list.h
 	gcc $(CFLAGS) -c token_test.c
 
 linked_list_test: linked_list_test.o linked_list.o
