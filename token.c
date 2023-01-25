@@ -17,7 +17,7 @@ Process new_process() {
     Process p = malloc(sizeof(ProcessObj));
     p->program = NULL;
     p->FO_type = NO_FILE_OPERATOR;
-    p->background_job = false;
+    //p->background_job = false;
     p->left_args = NULL;
     p->right_args = NULL;
 
@@ -25,13 +25,16 @@ Process new_process() {
 }
 
 void free_process(Process* p) {
-    if (p != NULL and *p != NULL) {
-        freeLinkedList((*p)->left_args);
-        freeLinkedList((*p)->right_args);
+    if (p != NULL && *p != NULL) {
+        freeLinkedList(&((*p)->left_args));
+        freeLinkedList(&((*p)->right_args));
         free((*p)->program);
         free(*p);
     }
 }
+
+// echo Hello world | grep Hello | wc -l
+// char **x = {"echo Hello world", "grep Hello", "wc -l", NULL}
 
 char** split_pipes(char *cmd_line) {
     char **pipe_array = calloc(4, sizeof(char*));
@@ -53,6 +56,7 @@ char** split_pipes(char *cmd_line) {
 
 }
 
+/*
 Process* split_redirection(char *cmd) {
     
     Process p = new_process();
@@ -68,12 +72,23 @@ Process* split_redirection(char *cmd) {
         if (token) {
             // convert token to Linked list
             // p->program = head(linked list)
-            p->left_args = splitter(token);
+            p->left_args = str_to_ll(token);
+            if (p->left_args == NULL) {
+                // print error
+            }
+            else if (
+                p->program = front(p->left_args);
+                popLeft(p->left_args);
+                else {
+                    fprintf(stderr, "Expected argument"
+                            " before >\n");
+                }
         }
         token = strtok(cmd_copy, ">");
-        if (token) {
+        if (token
             // convert token to linked list
-            p->right_args = splitter(token);
+            p->right_args = str_to_ll(token);
+            p->program = front
         }
     }
     else if (strstr(cmd_copy, ">>")) {
@@ -115,6 +130,7 @@ Process* split_redirection(char *cmd) {
     return cmd_args;
 
 }
+*/
 
 /*
 // str_to_LL() 

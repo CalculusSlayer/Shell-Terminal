@@ -4,6 +4,23 @@
 
 #include "linked_list.h"
 
+typedef enum File_Operator {
+    NO_FILE_OPERATOR = 0,
+    TRUNCATE_REDIRECTION = 1,
+    APPEND_REDIRECTION = 2
+} File_Operator;
+
+typedef struct ProcessObj* Process;
+
+typedef struct ProcessObj {
+    char *program;
+    File_Operator FO_type;
+    bool background_job;
+    // change type to linked list
+    LinkedList left_args;
+    LinkedList right_args;
+} ProcessObj;
+
 // new_process()
 // Create reference to new ProcessObj
 Process new_process();
@@ -23,24 +40,7 @@ void deallocator(char ***buf);
 // and return char** object containing them.
 char** split_pipes(char *cmd_line);
 
-Process* split_redirection(char* cmd);
+//Process* split_redirection(char* cmd);
 
-LinkedList str_to_LL(char *str);
-
-typedef enum File_Operator {
-    NO_FILE_OPERATOR = 0,
-    TRUNCATE_REDIRECTION = 1,
-    APPEND_REDIRECTION = 2
-} File_Operator;
-
-typedef struct ProcessObj* Process;
-
-typedef struct ProcessObj {
-    char *program;
-    File_Operator FO_type;
-    bool background_job;
-    // change type to linked list
-    LinkedList left_args;
-    LinkedList right_args;
-} ProcessObj;
+//LinkedList str_to_LL(char *str);
 
