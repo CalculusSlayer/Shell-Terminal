@@ -34,9 +34,9 @@ int main() {
     yy[0] = split_redirection(pipe_strings[0]);
 
     
-    printf("program - %s, FO_TYPE - %d\n", yy[0]->program, yy[0]->FO_type);
-    printLinkedList(stdout, yy[0]->left_args);
-    printLinkedList(stdout, yy[0]->right_args);
+    printf("program - %s, FO_TYPE - %d\n", (yy[0])->program, yy[0]->FO_type);
+    printLinkedList(stdout, (yy[0])->left_args);
+    printLinkedList(stdout, (yy[0])->right_args);
     deallocator(&pipe_strings);
 
     /*
