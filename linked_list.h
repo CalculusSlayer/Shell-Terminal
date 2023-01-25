@@ -50,6 +50,10 @@ void popLeft(LinkedList L);
 // Convert linked list into string array
 char** ll_to_str_arr(LinkedList L);
 
+// str_to_ll()
+// Convert str to linked list
+LinkedList str_to_ll(char* str);
+
 // printLinkedList()
 // Print Linked List to a fileStream using
 // fprintf().

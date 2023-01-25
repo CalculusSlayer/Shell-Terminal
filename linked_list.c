@@ -182,13 +182,15 @@ char** ll_to_str_arr(LinkedList L) {
 }
 
 LinkedList str_to_ll(char* str) {
+    if (!str)
+        return NULL;
     char *str_copy = strdup(str);
     // Need to make copy of buf
     char *token = NULL;
     const char delimiter[] = " ";
     LinkedList L = newLinkedList();
 
-    token = strtok(buf_copy, delimiter);
+    token = strtok(str_copy, delimiter);
 
     while (token != NULL) {
         //printf("%s\n", token);
@@ -196,7 +198,7 @@ LinkedList str_to_ll(char* str) {
         token = strtok(NULL, delimiter);
     }
 
-    free(str_cpy);
+    free(str_copy);
     //printLinkedList(L);
     return L;
 

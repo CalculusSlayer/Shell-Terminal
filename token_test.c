@@ -10,7 +10,7 @@
 
 int main() {
 
-    char str[] = "ls -l -x -x -f";
+    char str[] = "ls      -l     -x               -x -f";
     char str2[] = "echo Hello world | grep Hello|wc -l";
 
     char **x = splitter(str);
@@ -18,7 +18,7 @@ int main() {
     // char * ptr = *x
     char **ptr = x;
     for (int i = 0; i < 5; i++,  ptr++) {
-        printf("%s\n", *ptr);
+        printf("%s*", *ptr);
     }
 
     deallocator(&x);
@@ -29,6 +29,11 @@ int main() {
         printf("Pipe %i: %s\n", i, pipe_strings[i]);
     }
     deallocator(&pipe_strings);
+
+    LinkedList b1 = str_to_ll("      ");
+    printf("printing linked list b1\n");
+    printLinkedList(stdout, b1);
+    freeLinkedList(&b1);
 
     return 0;
 }
