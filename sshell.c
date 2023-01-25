@@ -60,10 +60,6 @@ int main(void)
         char **pipe_strings = split_pipes(cmd);
         Process processes[4] = { NULL, NULL, NULL, NULL };
         for (int i = 0; i < 4; i++) {
-            if (pipe_strings[i] == NULL) {
-                    printf("Pipe %i is NULL\n", i);
-            }
-            printf("Pipe %i: %s\n", i, pipe_strings[i]);
             processes[i] = split_redirection(pipe_strings[i]);
         }        
         /* Builtin command */
@@ -95,14 +91,12 @@ int main(void)
                 //fprintf(stderr, "+ completed '%s %s' [%d]\n", processes[0]->program, processes[0]->left_args, directory_not_found);
                 closedir(dirp);
                 //continue;
+            
+                fprintf(stderr, "+ completed '%s ", processes[0]->program);
+                printLinkedList(stderr, processes[0]->left_args);
+                fprintf(stderr, "' [%d]\n", directory_not_found);         
+                continue;
             }
-
-            fprintf(stderr, "+ completed %s ", processes[0]->program);
-
-            printLinkedList(stderr, processes[0]->left_args);
-            if (getLength(processes[0]->left_args) >= 1) printf(" ");
-            fprintf(stderr, "[%d]\n", directory_not_found);         
-            continue;
         }
         else {
     

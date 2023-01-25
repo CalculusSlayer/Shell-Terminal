@@ -41,7 +41,7 @@ char** split_pipes(char *cmd_line) {
     token = strtok(cmd_line_copy, delimiter);
     int pipe_array_index = 0;
     do {
-        printf("%d, %s\n", pipe_array_index, token);
+        //printf("%d, %s\n", pipe_array_index, token);
         pipe_array[pipe_array_index] = strdup(token);
         token = strtok(NULL, delimiter);
         pipe_array_index++;
