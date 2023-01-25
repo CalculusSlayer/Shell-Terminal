@@ -15,6 +15,11 @@
 
 int main(void)
 {       
+    //pid_t pid;
+    //pid = fork();
+    //Process initial_process;
+    //initial_process->program = "sshell";
+    
     char cmd[CMDLINE_MAX];
     char current_directory[100];
     DIR *dirp;
@@ -22,7 +27,7 @@ int main(void)
 
     while (1) {
         char *nl; 
-
+        bool full_spaces = true;
         //int retval;
 
         /* Print prompt */
@@ -31,7 +36,16 @@ int main(void)
 
         /* Get command line */
         fgets(cmd, CMDLINE_MAX, stdin);
-
+        
+        
+        for (int i = 0; i < CMDLINE_MAX; i++) {
+            if (cmd[i] == '\n') break;
+            else if (cmd[i] != ' ') {
+                full_spaces = false;
+                break;
+            }
+        }
+        if (full_spaces) continue;
         /* Print command line if stdin is not provided by terminal */
         if (!isatty(STDIN_FILENO)) {
             printf("%s", cmd);
@@ -43,10 +57,11 @@ int main(void)
         nl = strchr(cmd, '\n');
         if (nl)
             *nl = '\0';
-        
+       
 
         char **cmd_args = splitter(cmd);
-
+        //char *test_string = "echo hello world  grep Hello  output.txt";
+        //char **splitPipesTester = split_pipes(test_string);
         /* Builtin command */
         if (!strcmp(cmd_args[0], "exit")) {
             fprintf(stderr, "Bye...\n");
@@ -84,7 +99,7 @@ int main(void)
                 directory_not_found = 0;
             }
             else
-                fprintf(stderr, "Error: could not change directories.\n");
+                fprintf(stderr, "Error: cannot cd into directory\n");
 
 
             fprintf(stderr, "+ completed '%s %s' [%d]\n", cmd_args[0], cmd_args[1], directory_not_found);
@@ -92,26 +107,12 @@ int main(void)
             continue;
         }
 
-
-        //TODO:
-        //PWD and CD builtin commands
-
-        //TODO: Check if this is the correct error message.
-        //Doesn't this mean that there were no cmd_args?
-        /*
-        if (cmd_args == NULL) {
-            printf("Error: too many process arguments\n");
-            continue;
-        }
-        */
-
-        // Use execvp()
-        /* Regular command */
-        pid_t pid;
-        pid = fork();
+        /* Regular commands */
+        pid_t child_pid;
+        child_pid = fork();
 
 
-        if (pid == 0) {
+        if (child_pid == 0) {
             //char **cmd_args = splitter(cmd);
             //char *cmd_args[] = {cmd, "-l", NULL};
             execvp(cmd_args[0], cmd_args);
@@ -119,12 +120,12 @@ int main(void)
             deallocator(&cmd_args);
             exit(1);
         }
-        else if (pid > 0) {
-            int status;
-            waitpid(pid, &status, 0);
+        else if (child_pid > 0) {
+            int child_status;
+            waitpid(child_pid, &child_status, 0);
             // Printing to stderr instead of stdout now. Instructions
             // said to print to stderr.
-            fprintf(stderr, "+ completed '%s' [%d]\n", cmd,  WEXITSTATUS(status));
+            fprintf(stderr, "+ completed '%s' [%d]\n", cmd,  WEXITSTATUS(child_status));
             deallocator(&cmd_args);
         }
         else {
@@ -132,13 +133,6 @@ int main(void)
             exit(1);
         }
 
-        //printf("The process ID is: %ld\n", (long) pid);
-        //
-        /*
-        retval = system(cmd);
-        fprintf(stdout, "Return status value for '%s': %d\n",
-            cmd, retval);
-        */
     }
 
     return EXIT_SUCCESS;

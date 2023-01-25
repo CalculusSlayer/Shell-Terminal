@@ -4,7 +4,7 @@ CFLAGS = -Wall -Wextra -Wextra
 CFLAGS += -g
 #CFLAGS += -O2
 EXEC1 = sshell
-DEPENDENCIES = token.o
+DEPENDENCIES = token.o linked_list.o
 
 all: $(EXEC1) token_test linked_list_test
 

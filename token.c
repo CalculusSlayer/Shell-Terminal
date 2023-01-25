@@ -8,11 +8,11 @@
 const int MAX_ARGUMENTS = 16;
 Process pipes[4];
 
-/*
+
 int sshell_exec(Process *p) {
     return 0;
 }
-*/
+
 Process new_process() {
     Process p = malloc(sizeof(ProcessObj));
     p->program = NULL;
