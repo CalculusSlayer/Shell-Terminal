@@ -2,16 +2,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "sshell.h"
 #include "token.h"
 #include "linked_list.h"
 
 const int MAX_ARGUMENTS = 16;
 Process pipes[4];
-
-
-int sshell_exec(Process *p) {
-    return 0;
-}
 
 Process new_process() {
     Process p = malloc(sizeof(ProcessObj));
@@ -57,6 +53,9 @@ char** split_pipes(char *cmd_line) {
 }
 
 Process split_redirection(char *cmd) {
+    if (cmd == NULL || strlen(cmd) == 0) {
+        return NULL;
+    }
     
     Process p = new_process();
     char *cmd_copy = strdup(cmd);    
@@ -104,10 +103,10 @@ Process split_redirection(char *cmd) {
 
     else {
         p->left_args = str_to_ll(cmd_copy);
-        printf("LOOK BELOW\n");
-        printLinkedList(stdout, p->left_args);
+        //printf("LOOK BELOW\n");
+        //printLinkedList(stdout, p->left_args);
         p->program = strdup(front(p->left_args));
-        printf("In token.c: p->program = %s\n", p->program);
+        //printf("In token.c: p->program = %s\n", p->program);
         popLeft(p->left_args);
     }
 
@@ -150,7 +149,7 @@ char **splitter(char *buf) {
 
 void deallocator(char ***buf) {
     if (buf == NULL || *buf == NULL) {
-        fprintf(stderr, "character buffer is NULL\n");
+        //fprintf(stderr, "character buffer is NULL\n");
         return;
     }
 
@@ -162,3 +161,33 @@ void deallocator(char ***buf) {
     *buf = NULL;
 }
 
+void sshell_system(Process p) {
+    pid_t child_pid;
+    child_pid = fork();
+
+    char** cmd_args = ll_to_str_arr(p->left_args);
+    if (child_pid == 0) {
+        //char **cmd_args = splitter(cmd);
+        //char *cmd_args[] = {cmd, "-l", NULL};
+        execvp(p->program, cmd_args);
+        perror("execv");
+        deallocator(&cmd_args);
+        exit(1);
+    }
+    else if (child_pid > 0) {
+        int child_status;
+        waitpid(child_pid, &child_status, 0);
+        // Printing to stderr instead of stdout now. Instructions
+        // said to print to stderr.
+        //fprintf(stderr, "+ completed '%s' [%d]\n", cmd,  WEXITSTATUS(child_status));
+        fprintf(stderr, "+ completed ");
+        printLinkedList(stderr, p->left_args);
+        fprintf(stderr, " [%d]\n", WEXITSTATUS(child_status));
+        //deallocator(&cmd_args);
+        free_process(&p);
+    }
+    else {
+        perror("fork");
+        exit(1);
+    }
+}
