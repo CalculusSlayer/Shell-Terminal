@@ -43,7 +43,7 @@ int main(void)
             
             for (int i = 0; i < CMDLINE_MAX; i++) {
                 if (cmd[i] == '\n') break;
-               else if (cmd[i] != ' ') {
+                else if (cmd[i] != ' ') {
                     full_spaces = false;
                     break;
                 }
@@ -65,6 +65,7 @@ int main(void)
             char **cmd_args = splitter(cmd);
             //char *test_string = "echo hello world  grep Hello  output.txt";
             //char **splitPipesTester = split_pipes(test_string);
+            //Process testProcess = split_redirection(cmd);
             /* Builtin command */
             if (!strcmp(cmd_args[0], "exit")) {
                 fprintf(stderr, "Bye...\n");
@@ -105,7 +106,8 @@ int main(void)
                     fprintf(stderr, "Error: cannot cd into directory\n");
 
 
-                fprintf(stderr, "+ completed '%s %s' [%d]\n", cmd_args[0], cmd_args[1], directory_not_found);
+                fprintf(stderr, "+ completed '%s %s' [%d]\n", 
+                        cmd_args[0], cmd_args[1], directory_not_found);
                 closedir(dirp);
                 continue;
             }
