@@ -24,19 +24,26 @@ int main() {
     deallocator(&x);
     deallocator(NULL);
     
-    
     Process yy[4] = {NULL, NULL, NULL, NULL};
     for (int i = 0; i < 4; i++) {
+        if (pipe_strings[i] == NULL) {
+            printf("Pipe %i is NULL\n", i);
+        }
         printf("Pipe %i: %s\n", i, pipe_strings[i]);
-        //yy[i] = split_redirection(pipe_strings[i]);
+        yy[i] = split_redirection(pipe_strings[i]);
     }
 
-    yy[0] = split_redirection(pipe_strings[0]);
-
-    
-    printf("program - %s, FO_TYPE - %d\n", (yy[0])->program, yy[0]->FO_type);
-    printLinkedList(stdout, (yy[0])->left_args);
-    printLinkedList(stdout, (yy[0])->right_args);
+    //yy[0] = split_redirection(pipe_strings[0]);
+ 
+    for (int i = 0; i < 4; i++) {
+        if (yy[i] != NULL) {
+            printf("program - %s, FO_TYPE - %d\n", yy[i]->program, yy[i]->FO_type);
+            printf("left_args = ");
+            printLinkedList(stdout, yy[i]->left_args);
+            printf("right_args = ");
+            printLinkedList(stdout, yy[i]->right_args);
+        }
+    }
     deallocator(&pipe_strings);
 
     /*
