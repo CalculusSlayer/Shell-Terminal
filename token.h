@@ -40,7 +40,7 @@ void deallocator(char ***buf);
 // and return char** object containing them.
 char** split_pipes(char *cmd_line);
 
-//Process* split_redirection(char* cmd);
+Process split_redirection(char* cmd);
 
 //LinkedList str_to_LL(char *str);
 

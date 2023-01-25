@@ -56,8 +56,7 @@ char** split_pipes(char *cmd_line) {
 
 }
 
-/*
-Process* split_redirection(char *cmd) {
+Process split_redirection(char *cmd) {
     
     Process p = new_process();
     char *cmd_copy = strdup(cmd);    
@@ -73,24 +72,25 @@ Process* split_redirection(char *cmd) {
             // convert token to Linked list
             // p->program = head(linked list)
             p->left_args = str_to_ll(token);
-            if (p->left_args == NULL) {
-                // print error
-            }
-            else if (
-                p->program = front(p->left_args);
-                popLeft(p->left_args);
-                else {
-                    fprintf(stderr, "Expected argument"
-                            " before >\n");
-                }
+            p->program = front(p->left_args);
+            popLeft(p->left_args);
         }
+        else {
+            fprintf(stderr, "Expected argument left of >");
+        }
+
         token = strtok(cmd_copy, ">");
-        if (token
+        if (token) {
             // convert token to linked list
             p->right_args = str_to_ll(token);
-            p->program = front
+            if (getLength(p->right_args) != 1) {
+                fprintf(stderr, "Expected one argument after >");
+            }
+        
         }
     }
+
+    /*
     else if (strstr(cmd_copy, ">>")) {
         token = strtok(cmd_copy, ">>");
         p->FO_type = APPEND_REDIRECTION;
@@ -100,62 +100,18 @@ Process* split_redirection(char *cmd) {
         if (token)
             p->right_args = splitter(token);
     }
+    */
+
     else {
-        p->left_args = splitter(cmd_copy);
-        p->right_args = NULL;
-        p->FO_type = NO_FILE_OPERATOR;
+        p->left_args = str_to_ll(token);
+        p->program = front(p->left_args);
+        popLeft(p->left_args);
     }
 
-    if (!token) {
-        //fprintf(stderr, "
-
-    while (token != NULL) {
-        printf("%s\n", token);
-        test[token]
-        token = strtok(NULL, delimiter);
-    }
-
-    for (int cmd_args_index=0; token != NULL;
-            cmd_args_index++) {
-        //printf("%s\n", token);
-        //If more than 16 valid 
-        if (cmd_args_index == MAX_ARGUMENTS) {
-            free(buf_copy);
-            return NULL;
-        }
-        cmd_args[cmd_args_index] = strdup(token);
-        token = strtok(0, delimiter);
-    }
     free(cmd_copy);
-    return cmd_args;
+    return p;
 
 }
-*/
-
-/*
-// str_to_LL() 
-// Convert str to LinkedList and return it
-LinkedList str_to_LL(char *str) {
-    char *str_copy = strdup(str);    
-    // Need to make copy of buf
-    char *token = NULL;
-    const char delimiter[] = " ";
-    LinkedList L = newLinkedList();
-
-    token = strtok(buf_copy, delimiter);
-
-    while (token != NULL) {
-        //printf("%s\n", token);
-        appendRight(L, token);
-        token = strtok(NULL, delimiter);
-    }
-
-    free(str_cpy);
-    //printLinkedList(L);
-    return L;
-
-}
-*/
 
 char **splitter(char *buf) {
     char **cmd_args = calloc(MAX_ARGUMENTS, sizeof(char*));
