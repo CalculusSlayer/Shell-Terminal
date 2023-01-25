@@ -25,6 +25,14 @@ void freeLinkedList(LinkedList* pL);
 // Get length of the Linked List
 int getLength(LinkedList L);
 
+// front()
+// Return string at front of Linked List
+char* front(LinkedList L);
+
+// back()
+// Return string at back of Linked List
+char* back(LinkedList L);
+
 // isEmpty()
 // Returns true or false depending on
 // whether Linked List is empty or not.
@@ -37,6 +45,10 @@ void appendRight(LinkedList L, char* val);
 // PopLeft()
 // Pop head of Linked List
 void popLeft(LinkedList L);
+
+// ll_to_str_arr()
+// Convert linked list into string array
+char** ll_to_str_arr(LinkedList L);
 
 // printLinkedList()
 // Print Linked List to a fileStream using

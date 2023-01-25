@@ -17,6 +17,7 @@ typedef struct LinkedListObj{
     Node head;
     Node tail;
     int length;
+    Node cursor;
 } LinkedListObj;
 
 // newNode() - private function
@@ -56,6 +57,7 @@ LinkedList newLinkedList() {
     L->head = NULL;
     L->tail = NULL;
     L->length = 0;
+    L->cursor = NULL;
     return L;
 }
 
@@ -82,6 +84,36 @@ int getLength(LinkedList L) {
     }
 
     return L->length;
+}
+
+char* front(LinkedList L) {
+    if (!L) {
+        fprintf(stderr, "Cannot call front on a NULL reference\n");
+        exit(EXIT_FAILURE);
+    }
+    if (getLength(L) > 0) {
+        return L->head->val;
+    }
+    else {
+        fprintf(stderr, "Cannot return front since length <= 0\n");
+        freeLinkedList(&L); // not needed. check before calling
+        exit(EXIT_FAILURE);
+    }
+}
+
+char* back(LinkedList L) {
+    if (!L) {
+        fprintf(stderr, "Cannot call back on a NULL reference\n");
+        exit(EXIT_FAILURE);
+    }
+    if (getLength(L) > 0) {
+        return L->tail->val;
+    }
+    else {
+        fprintf(stderr, "Cannot return back since length <= 0\n");
+        freeLinkedList(&L); // not needed. check before calling
+        exit(EXIT_FAILURE);
+    }
 }
 
 // isEmpty()
@@ -137,6 +169,37 @@ void popLeft(LinkedList L) {
     L->length--;
     freeNode(&N);
         
+}
+
+char** ll_to_str_arr(LinkedList L) {
+    char **ret = malloc(getLength(L) * sizeof(char*));
+    int ret_index = 0;
+    for (Node N = L->head; N; N = N->next) {
+        ret[ret_index] = strdup(N->val);
+        ret_index++;
+    }
+    return ret;
+}
+
+LinkedList str_to_ll(char* str) {
+    char *str_copy = strdup(str);
+    // Need to make copy of buf
+    char *token = NULL;
+    const char delimiter[] = " ";
+    LinkedList L = newLinkedList();
+
+    token = strtok(buf_copy, delimiter);
+
+    while (token != NULL) {
+        //printf("%s\n", token);
+        appendRight(L, token);
+        token = strtok(NULL, delimiter);
+    }
+
+    free(str_cpy);
+    //printLinkedList(L);
+    return L;
+
 }
 
 void printLinkedList(FILE *fileStream, LinkedList L) {
