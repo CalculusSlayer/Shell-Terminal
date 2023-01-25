@@ -103,8 +103,11 @@ Process split_redirection(char *cmd) {
     */
 
     else {
-        p->left_args = str_to_ll(token);
-        p->program = front(p->left_args);
+        p->left_args = str_to_ll(cmd_copy);
+        printf("LOOK BELOW\n");
+        printLinkedList(stdout, p->left_args);
+        p->program = strdup(front(p->left_args));
+        printf("In token.c: p->program = %s\n", p->program);
         popLeft(p->left_args);
     }
 
