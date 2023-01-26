@@ -1,6 +1,8 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "sshell.h"
 #include "token.h"
@@ -15,7 +17,7 @@ Process new_process() {
     p->FO_type = NO_FILE_OPERATOR;
     //p->background_job = false;
     p->left_args = NULL;
-    p->right_args = NULL;
+    p->file_name = NULL;
 
     return p;
 }
@@ -23,7 +25,7 @@ Process new_process() {
 void free_process(Process* p) {
     if (p != NULL && *p != NULL) {
         freeLinkedList(&((*p)->left_args));
-        freeLinkedList(&((*p)->right_args));
+        freeLinkedList(&((*p)->file_name));
         free((*p)->program);
         free(*p);
     }
@@ -81,14 +83,15 @@ Process split_redirection(char *cmd) {
         token = strtok(cmd_copy, ">");
         if (token) {
             // convert token to linked list
-            p->right_args = str_to_ll(token);
-            if (getLength(p->right_args) != 1) {
+            p->file_name = str_to_ll(token);
+            if (getLength(p->file_name) != 1) {
                 fprintf(stderr, "Expected one argument after >");
             }
         
         }
     }
-
+    
+    // TODO: MOVE BEFORE > IF CLAUSE
     /*
     else if (strstr(cmd_copy, ">>")) {
         token = strtok(cmd_copy, ">>");
@@ -97,7 +100,7 @@ Process split_redirection(char *cmd) {
             p->left_args = splitter(token);
         token = strtok(cmd_copy, ">>");
         if (token)
-            p->right_args = splitter(token);
+            p->right_ = splitter(token);
     }
     */
 
@@ -167,6 +170,20 @@ void sshell_system(Process p) {
 
     //char** cmd_args = ll_to_str_arr(p->left_args);
     if (child_pid == 0) {
+        if (p->FO_type == TRUNCATE_REDIRECTION) {
+            if (p->file_name && getLength(p->file_name)==1) {
+                // TODO: CHANGE TO O_RDWR if needed
+                int f1 = open(front(p->file_name), O_CREAT|O_TRUNC|O_WRONLY, 0644); 
+                dup2(f1, STDOUT_FILENO);
+                close(f1);
+            }
+            else if (!(p->FO_type)) {
+                fprintf(stderr, "There is no argument after >");
+            }
+            else {
+                fprintf(stderr, "There are too many arguments after >");
+            }
+        }
         //char **cmd_args = splitter(cmd);
         //char *cmd_args[] = {cmd, "-l", NULL};
         char** cmd_args = ll_to_str_arr(p->left_args, p->program);
@@ -181,9 +198,16 @@ void sshell_system(Process p) {
         // Printing to stderr instead of stdout now. Instructions
         // said to print to stderr.
         //fprintf(stderr, "+ completed '%s' [%d]\n", cmd,  WEXITSTATUS(child_status));
-        fprintf(stderr, "+ completed ");
-        printLinkedList(stderr, p->left_args);
-        fprintf(stderr, " [%d]\n", WEXITSTATUS(child_status));
+        fprintf(stderr, "+ completed '%s", p->program);
+        if (p->left_args && getLength(p->left_args) > 0) {
+            fprintf(stderr, " ");
+            printLinkedList(stderr, p->left_args);
+        }
+
+        // TODO: add if statement for printing out 
+        // file director to stderr
+
+        fprintf(stderr, "' [%d]\n", WEXITSTATUS(child_status));
         //deallocator(&cmd_args);
         free_process(&p);
     }

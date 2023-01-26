@@ -45,9 +45,9 @@ int main() {
             if (yy[i]->left_args) {
                 printLinkedList(stdout, yy[i]->left_args);
             }
-            printf("right_args = ");
-            if (yy[i]->right_args) {
-                printLinkedList(stdout, yy[i]->right_args);
+            printf("file_name = ");
+            if (yy[i]->file_name) {
+                printLinkedList(stdout, yy[i]->file_name);
             }
         }
     }

@@ -18,7 +18,7 @@ typedef struct ProcessObj {
     //bool background_job;
     // change type to linked list
     LinkedList left_args;
-    LinkedList right_args;
+    LinkedList file_name;
 } ProcessObj;
 
 // new_process()
