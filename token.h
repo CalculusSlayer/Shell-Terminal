@@ -21,6 +21,19 @@ typedef struct ProcessObj {
     LinkedList file_name;
 } ProcessObj;
 
+// StringArray type is a pointer to StringArrayObj
+// It will be used for storing char** with
+// their lengths to make freeing memory easier.
+typedef struct StringArrayObj* StringArray;
+
+// StringArrayObj is a type that contains
+// a char** parameter which represents the array
+// and a int parameter which represents the length.
+typedef struct StringArrayObj {
+    char** arr;
+    int length;
+} StringArrayObj;
+
 // new_process()
 // Create reference to new ProcessObj
 Process new_process();
@@ -31,16 +44,18 @@ void free_process(Process* p);
 
 
 // TODO: Need to change parsing functions
-char **splitter(char *buf);
+//char **splitter(char *buf);
 
-void deallocator(char ***buf);
+//void deallocator(char ***buf);
+// Replace with this below
+void deallocator(StringArray* buf);
 
 // split_pipes() 
 // splits cmd line into a max of 4 string (3 pipes)
 // and return char** object containing them.
-char** split_pipes(char *cmd_line);
+StringArray split_pipes(char *cmd_line);
 
 Process split_redirection(char* cmd);
 
-void sshell_system(Process); 
+int sshell_system(Process); 
 
