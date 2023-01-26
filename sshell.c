@@ -1,15 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/wait.h>
+// sshell.c
+// The main program that runs the shell program
+// i.e. the interface between the user and the terminal.
 
-#include "token.h"
-#include <stdbool.h>
-#include <dirent.h>
-
-#define CMDLINE_MAX 512
-#define TOKEN_LENGTH_MAX 32 // 32 + 1 to make space for NULL character
+#include "sshell.h"
 
 //Referenced slide deck 03(syscalls) for information regarding readdir();
 

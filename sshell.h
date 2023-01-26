@@ -1,12 +1,18 @@
 // sshell.h
-// Contains header files used in sshell.c
-//
+// Contains header files 
+// and important constants
+// used in sshell.c
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
-
-#include "token.h"
 #include <stdbool.h>
 #include <dirent.h>
+
+#include "token.h"
+#include "linked_list.h"
+
+#define CMDLINE_MAX 512
+#define TOKEN_LENGTH_MAX 32 

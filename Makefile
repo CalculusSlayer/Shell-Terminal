@@ -32,5 +32,6 @@ linked_list_test.o: linked_list_test.c $(HEADERS)
 
 linked_list.o: linked_list.c $(HEADERS)
 	gcc $(CFLAGS) -c linked_list.c
+
 clean:
 	rm -f *.o $(EXEC1) token_test linked_list_test
