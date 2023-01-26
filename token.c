@@ -26,15 +26,29 @@ void free_process(Process* p) {
     if (p != NULL && *p != NULL) {
         freeLinkedList(&((*p)->left_args));
         freeLinkedList(&((*p)->file_name));
-        free((*p)->program);
+        if ((*p)->program) {
+            free((*p)->program);
+            (*p)->program = NULL;
+        }
         free(*p);
+        p = NULL;
     }
 }
+
+StringArray new_StringArray(char** s, int length) {
+    StringArray SA = malloc(sizeof(StringArrayObj));
+    SA->arr = s; // char** s is already allocated elsewhere
+               // right before creating this object
+    SA->length = length;
+    return SA;
+}
+
+
 
 // echo Hello world | grep Hello | wc -l
 // char **x = {"echo Hello world", "grep Hello", "wc -l", NULL}
 
-char** split_pipes(char *cmd_line) {
+StringArray split_pipes(char *cmd_line) {
     char **pipe_array = calloc(4, sizeof(char*));
     char *cmd_line_copy = strdup(cmd_line);
     char *token = NULL;
@@ -50,7 +64,7 @@ char** split_pipes(char *cmd_line) {
     } while (token);
     
     free(cmd_line_copy);
-    return pipe_array;
+    return new_StringArray(pipe_array, 4);
 
 }
 
@@ -60,52 +74,82 @@ Process split_redirection(char *cmd) {
     }
     
     Process p = new_process();
-    char *cmd_copy = strdup(cmd);    
+    //char *cmd_copy = strdup(cmd);    
     // Need to make copy of buf
-    char *token = NULL;
+    char *needle = NULL;
     //const char delimiter[] = " ";
-
-
-    if (strstr(cmd_copy, ">")) {
-        token = strtok(cmd_copy, ">");
-        p->FO_type = TRUNCATE_REDIRECTION;
-        if (token) {
-            // convert token to Linked list
-            // p->program = head(linked list)
-            p->left_args = str_to_ll(token);
-            p->program = front(p->left_args);
+    if ((needle=strstr(cmd, ">>"))) {
+        p->FO_type = APPEND_REDIRECTION;
+        char *cmd_copy = strdup(cmd);
+        cmd_copy[needle-cmd] = '\0';
+        p->left_args = str_to_ll(cmd_copy);
+        if (p->left_args && getLength(p->left_args) > 0) {
+            p->program = strdup(front(p->left_args));
             popLeft(p->left_args);
         }
         else {
-            fprintf(stderr, "Expected argument left of >");
+            p->program = strdup("NULL"); // p->program is char* type
+            fprintf(stderr, "token.c: Expected argument(s) before >>");
+        }
+        
+        //unsigned long int difference = needle - cmd; 
+        char *file = needle + 2;
+        if (*(file)) {
+            p->file_name = str_to_ll(file);
+            if (isEmpty(p->file_name)) {
+                freeLinkedList(&(p->file_name));
+                fprintf(stderr, "token.c: Expected file name after > >\n"); 
+            }
+            else if (getLength(p->file_name) > 1) {
+                freeLinkedList(&(p->file_name));
+                fprintf(stderr, "token.c: Expected only one argument after >>\n");
+            }
         }
 
-        token = strtok(cmd_copy, ">");
-        if (token) {
-            // convert token to linked list
-            p->file_name = str_to_ll(token);
-            if (getLength(p->file_name) != 1) {
-                fprintf(stderr, "Expected one argument after >");
-            }
-        
+        else {
+            fprintf(stderr, "token.c: Expected file name after >>\n");
         }
+        free(cmd_copy);
+    }
+
+    else if ((needle=strstr(cmd, ">"))) {
+        p->FO_type = TRUNCATE_REDIRECTION;
+        char *cmd_copy = strdup(cmd);
+        cmd_copy[needle-cmd] = '\0';
+        p->left_args = str_to_ll(cmd_copy);
+        if (p->left_args && getLength(p->left_args) > 0) {
+            p->program = strdup(front(p->left_args));
+            popLeft(p->left_args);
+        }
+        else {
+            p->program = strdup("NULL"); // p->program is char* type
+            fprintf(stderr, "token.c: Expected argument(s) before >");
+        }
+        
+        //unsigned long int difference = needle - cmd; 
+        char *file = needle + 1;
+        if (*(file)) {
+            p->file_name = str_to_ll(file);
+            if (isEmpty(p->file_name)) {
+                freeLinkedList(&(p->file_name));
+                fprintf(stderr, "token.c: Expected file name after >\n"); 
+            }
+            else if (getLength(p->file_name) > 1) {
+                freeLinkedList(&(p->file_name));
+                fprintf(stderr, "token.c: Expected only one argument after >\n");
+            }
+        }
+
+        else {
+            fprintf(stderr, "token.c: Expected file name after >\n");
+        }
+        free(cmd_copy);
     }
     
-    // TODO: MOVE BEFORE > IF CLAUSE
-    /*
-    else if (strstr(cmd_copy, ">>")) {
-        token = strtok(cmd_copy, ">>");
-        p->FO_type = APPEND_REDIRECTION;
-        if (token)
-            p->left_args = splitter(token);
-        token = strtok(cmd_copy, ">>");
-        if (token)
-            p->right_ = splitter(token);
-    }
-    */
-
+    // No file direction operator
+    // so just do a regular split
     else {
-        p->left_args = str_to_ll(cmd_copy);
+        p->left_args = str_to_ll(cmd);
         //printf("LOOK BELOW\n");
         //printLinkedList(stdout, p->left_args);
         p->program = strdup(front(p->left_args));
@@ -113,11 +157,11 @@ Process split_redirection(char *cmd) {
         popLeft(p->left_args);
     }
 
-    free(cmd_copy);
     return p;
 
 }
 
+/*
 char **splitter(char *buf) {
     char **cmd_args = calloc(MAX_ARGUMENTS, sizeof(char*));
     char *buf_copy = strdup(buf);    
@@ -126,6 +170,7 @@ char **splitter(char *buf) {
     const char delimiter[] = " ";
 
     token = strtok(buf_copy, delimiter);
+*/
 
     /*
     while (token != NULL) {
@@ -135,6 +180,7 @@ char **splitter(char *buf) {
     }
     */
 
+/*
     for (int cmd_args_index=0; token != NULL;
             cmd_args_index++) {
         //printf("%s\n", token);
@@ -149,8 +195,28 @@ char **splitter(char *buf) {
     free(buf_copy);
     return cmd_args;
 }
+*/
 
-void deallocator(char ***buf) {
+// Replaced char*** with StringArray
+void deallocator(StringArray* SA) {
+    
+    if (SA == NULL || *SA == NULL) {
+        return;
+    }
+
+    for (int c = 0; c < (*SA)->length; c++) {
+        if (((*SA)->arr)[c]) {
+            free(((*SA)->arr)[c]);
+            ((*SA)->arr)[c] = NULL;
+        }
+    }
+    
+    free((*SA)->arr);
+    (*SA)->arr = NULL;
+    free(*SA);
+    *SA = NULL;
+
+    /*
     if (buf == NULL || *buf == NULL) {
         //fprintf(stderr, "character buffer is NULL\n");
         return;
@@ -162,42 +228,70 @@ void deallocator(char ***buf) {
     }
     free(*buf);
     *buf = NULL;
+    */
 }
 
-void sshell_system(Process p) {
+int sshell_system(Process p) {
     pid_t child_pid;
     child_pid = fork();
 
     //char** cmd_args = ll_to_str_arr(p->left_args);
     if (child_pid == 0) {
-        if (p->FO_type == TRUNCATE_REDIRECTION) {
-            if (p->file_name && getLength(p->file_name)==1) {
+        if (p->FO_type == TRUNCATE_REDIRECTION
+                || p->FO_type == APPEND_REDIRECTION) {
+            //printf("This is the p->file_name: ");
+            //printLinkedList(stdout, p->file_name);
+            //printf("\n");
+            
+            unsigned int FILE_OPEN_MODE = 0;
+            char* arrow = NULL;
+            if (p->FO_type == TRUNCATE_REDIRECTION) {
+                FILE_OPEN_MODE = O_TRUNC;
+                arrow = ">";
+            }
+            else {
+                FILE_OPEN_MODE = O_APPEND;
+                arrow = ">>";
+            }
+
+            if (p->file_name && getLength(p->file_name)==1
+                    && p->left_args && getLength(p->left_args)>0) {
                 // TODO: CHANGE TO O_RDWR if needed
-                int f1 = open(front(p->file_name), O_CREAT|O_TRUNC|O_WRONLY, 0644); 
+                // FILE_OPEN_MODE is either O_TRUNC or O_APPEND
+                int f1 = open(front(p->file_name), O_CREAT|FILE_OPEN_MODE|O_WRONLY, 0644); 
                 dup2(f1, STDOUT_FILENO);
                 close(f1);
             }
-            else if (!(p->FO_type)) {
-                fprintf(stderr, "There is no argument after >");
+
+            else if (!(p->left_args) || getLength(p->left_args)==0) {
+                fprintf(stderr, "sshell_system(), token.c: There is no argument(s) before %s\n",
+                        arrow);
             }
-            else {
-                fprintf(stderr, "There are too many arguments after >");
+            else if (!(p->file_name)) {
+                fprintf(stderr, "sshell_system(), sshell.c: There is no argument after %s\n",
+                        arrow);
+            }
+            else if (getLength(p->file_name) > 1) {
+                fprintf(stderr, "sshell.c: There are too many arguments after %s\n", arrow);
             }
         }
         //char **cmd_args = splitter(cmd);
         //char *cmd_args[] = {cmd, "-l", NULL};
-        char** cmd_args = ll_to_str_arr(p->left_args, p->program);
-        execvp(p->program, cmd_args);
+        StringArray cmd_args = new_StringArray(
+                ll_to_str_arr(p->left_args, p->program), getLength(p->left_args)+2);
+        execvp(p->program, cmd_args->arr);
         perror("execv");
         deallocator(&cmd_args);
         exit(1);
     }
+
     else if (child_pid > 0) {
         int child_status;
         waitpid(child_pid, &child_status, 0);
         // Printing to stderr instead of stdout now. Instructions
         // said to print to stderr.
         //fprintf(stderr, "+ completed '%s' [%d]\n", cmd,  WEXITSTATUS(child_status));
+        /*
         fprintf(stderr, "+ completed '%s", p->program);
         if (p->left_args && getLength(p->left_args) > 0) {
             fprintf(stderr, " ");
@@ -209,8 +303,13 @@ void sshell_system(Process p) {
 
         fprintf(stderr, "' [%d]\n", WEXITSTATUS(child_status));
         //deallocator(&cmd_args);
-        free_process(&p);
+        */
+
+        //TODO: DECIDE WHETHER TO FREE PROCESS IN MAIN OR HERE!!!
+        //free_process(&p);
+        return WEXITSTATUS(child_status);
     }
+
     else {
         perror("fork");
         exit(1);

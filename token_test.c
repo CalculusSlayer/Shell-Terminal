@@ -11,15 +11,18 @@
 int main() {
 
     char str[] = "ls      -l     -x               -x -f";
-    char str2[] = "echo Hello world|grep Hello|wc -l";
+    //char str2[] = "echo Hello world|grep Hello|wc -l";
+    char str2[] = "echo hello world > a.txt";
 
     char **x = splitter(str);
     char **pipe_strings = split_pipes(str2);
     // char * ptr = *x
-    char **ptr = x;
+    //char **ptr = x;
+    /*
     for (int i = 0; i < 5; i++,  ptr++) {
         printf("%s*", *ptr);
     }
+    */
 
     deallocator(&x);
     deallocator(NULL);
@@ -29,9 +32,11 @@ int main() {
     // IN sshell.c
     Process yy[4] = {NULL, NULL, NULL, NULL};
     for (int i = 0; i < 4; i++) {
+        /*
         if (pipe_strings[i] == NULL) {
-            printf("Pipe %i is NULL\n", i);
+            printf("\nPipe %i is NULL\n", i);
         }
+        */
         printf("Pipe %i: %s\n", i, pipe_strings[i]);
         yy[i] = split_redirection(pipe_strings[i]);
     }

@@ -57,15 +57,19 @@ int main(void)
 
         //char **cmd_args = splitter(cmd);
         //Process testProcess = split_redirection(cmd);
-        char **pipe_strings = split_pipes(cmd);
+        StringArray pipe_strings = split_pipes(cmd);
         Process processes[4] = { NULL, NULL, NULL, NULL };
         for (int i = 0; i < 4; i++) {
-            processes[i] = split_redirection(pipe_strings[i]);
+            processes[i] = split_redirection(pipe_strings->arr[i]);
         }        
         /* Builtin command */
         if (!strcmp(processes[0]->program, "exit")) {
             fprintf(stderr, "Bye...\n");
             fprintf(stderr, "+ completed '%s' [%d]\n", "exit", 0);
+            deallocator(&pipe_strings);
+            for (int i=0; i < 4; i++) {
+                free_process(&processes[i]);
+            }
             break;
         }
         //TODO: Debug pwd. It is failing test.sh.
@@ -74,6 +78,10 @@ int main(void)
             getcwd(current_directory, sizeof(current_directory));
             printf("%s\n", current_directory);         
             fprintf(stderr, "+ completed '%s' [%d]\n", "pwd", 0);
+            deallocator(&pipe_strings);
+            for (int i=0; i < 4; i++) {
+                free_process(&processes[i]);
+            }
             continue;
         }
         else if (!strcmp(processes[0]->program, "cd")) {
@@ -92,16 +100,32 @@ int main(void)
                 closedir(dirp);
                 //continue;
             
+                // TODO: simplify error message here if needed
                 fprintf(stderr, "+ completed '%s ", processes[0]->program);
                 printLinkedList(stderr, processes[0]->left_args);
                 fprintf(stderr, "' [%d]\n", directory_not_found);         
-                continue;
+
             }
+            deallocator(&pipe_strings);
+            for (int i=0; i < 4; i++) {
+                free_process(&processes[i]);
+            }
+            continue;
         }
         else {
-    
+            // TODO: HAVE A LOOP TO CALL SSHELL_SYSTEM
+            // UP TO 4 TIMES
+            // Never Mind - Call sshell_system_pipe() function
+            // if pipe count > 0
             /* Regular commands */
-            sshell_system(processes[0]);
+            int ret_val = sshell_system(processes[0]);
+            fprintf(stderr, "+ completed '%s' [%d]\n", cmd, ret_val); 
+
+
+            deallocator(&pipe_strings);
+            for (int i=0; i < 4; i++) {
+                free_process(&processes[i]);
+            }
             /*
             pid_t child_pid;
             child_pid = fork();
