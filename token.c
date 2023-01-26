@@ -232,6 +232,11 @@ void deallocator(StringArray* SA) {
 }
 
 int sshell_system(Process p) {
+    // If NULL process is passed, return 0
+    if (!p) {
+        return 0;
+    }
+
     pid_t child_pid;
     child_pid = fork();
 

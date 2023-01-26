@@ -10,12 +10,11 @@
 
 int main() {
 
-    char str[] = "ls      -l     -x               -x -f";
+    //char str[] = "ls      -l     -x               -x -f";
     //char str2[] = "echo Hello world|grep Hello|wc -l";
     char str2[] = "echo hello world > a.txt";
 
-    char **x = splitter(str);
-    char **pipe_strings = split_pipes(str2);
+    StringArray pipe_strings = split_pipes(str2);
     // char * ptr = *x
     //char **ptr = x;
     /*
@@ -24,7 +23,6 @@ int main() {
     }
     */
 
-    deallocator(&x);
     deallocator(NULL);
     
 
@@ -37,8 +35,8 @@ int main() {
             printf("\nPipe %i is NULL\n", i);
         }
         */
-        printf("Pipe %i: %s\n", i, pipe_strings[i]);
-        yy[i] = split_redirection(pipe_strings[i]);
+        printf("Pipe %i: %s\n", i, (pipe_strings->arr)[i]);
+        yy[i] = split_redirection((pipe_strings->arr)[i]);
     }
 
     //yy[0] = split_redirection(pipe_strings[0]);
@@ -59,10 +57,12 @@ int main() {
     
     for (int i = 0; i < 4; i++) {
         sshell_system(yy[i]);
+        free_process(&(yy[i]));
     }
 
 
     deallocator(&pipe_strings);
+
 
     /*
     LinkedList b1 = str_to_ll("      ");
