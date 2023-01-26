@@ -47,7 +47,12 @@ void appendRight(LinkedList L, char* val);
 void popLeft(LinkedList L);
 
 // ll_to_str_arr()
-// Convert linked list into string array
+// Convert linked list into char** object.
+// A specific format is needed to call
+// execvp(), so this function sets it up
+// perfectly. First argument has to be the
+// command while the last argument in char**
+// has to be NULL.
 char** ll_to_str_arr(LinkedList L, char*);
 
 // str_to_ll()
