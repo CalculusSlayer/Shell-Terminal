@@ -57,5 +57,5 @@ StringArray split_pipes(char *cmd_line);
 
 Process split_redirection(char* cmd);
 
-int sshell_system(Process); 
+int sshell_system(Process p, bool background_job); 
 

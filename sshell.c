@@ -17,6 +17,8 @@ int main(void)
     while (1) {
         char *nl; 
         bool full_spaces = true;
+        bool background_job = false;
+        bool parsing_error_detected = false;
         //int retval;
 
         /* Print prompt */
@@ -31,10 +33,24 @@ int main(void)
             if (cmd[i] == '\n') break;
             else if (cmd[i] != ' ') {
                 full_spaces = false;
-                break;
+                if (background_job) {
+                    fprintf(stderr, "Error: mislocated background sign\n");
+                    parsing_error_detected = true;
+
+                }
+            }
+            if (cmd[i] == '&') {
+                background_job = true;
             }
         }
+
         if (full_spaces) continue;
+        if (background_job) {
+            char* ambersand_needle = strstr(cmd, "&");
+            size_t ambersand_index = ambersand_needle - cmd;
+            cmd[ambersand_index] = '\0';
+        }
+
         /* Print command line if stdin is not provided by terminal */
         if (!isatty(STDIN_FILENO)) {
             printf("%s", cmd);
@@ -55,6 +71,17 @@ int main(void)
         for (int i = 0; i < 4; i++) {
             processes[i] = split_redirection(pipe_strings->arr[i]);
         }        
+        
+        // If parsing error was detected, then command line
+        // and go to next iteration.
+        if (parsing_error_detected) {
+            deallocator(&pipe_strings);
+            for (int i=0; i < 4; i++) {
+                free_process(&processes[i]);
+            }
+            continue;
+        }
+
         /* Builtin command */
         if (!strcmp(processes[0]->program, "exit")) {
             fprintf(stderr, "Bye...\n");
@@ -111,9 +138,11 @@ int main(void)
             // Never Mind - Call sshell_system_pipe() function
             // if pipe count > 0
             /* Regular commands */
-            int ret_val = sshell_system(processes[0]);
-            fprintf(stderr, "+ completed '%s' [%d]\n", cmd, ret_val); 
-
+            int ret_val = sshell_system(processes[0], background_job);
+            if (background_job)
+                fprintf(stderr, "+ completed '%s&' [%d]\n", cmd, ret_val); 
+            else
+                fprintf(stderr, "+ completed '%s' [%d]\n", cmd, ret_val); 
 
             deallocator(&pipe_strings);
             for (int i=0; i < 4; i++) {

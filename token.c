@@ -231,7 +231,7 @@ void deallocator(StringArray* SA) {
     */
 }
 
-int sshell_system(Process p) {
+int sshell_system(Process p, bool background_job) {
     // If NULL process is passed, return 0
     if (!p) {
         return 0;
@@ -292,7 +292,12 @@ int sshell_system(Process p) {
 
     else if (child_pid > 0) {
         int child_status;
-        waitpid(child_pid, &child_status, 0);
+        if (background_job) {
+            waitpid(child_pid, &child_status, WNOHANG);
+        }
+        else {
+            waitpid(child_pid, &child_status, 0);
+        }
         // Printing to stderr instead of stdout now. Instructions
         // said to print to stderr.
         //fprintf(stderr, "+ completed '%s' [%d]\n", cmd,  WEXITSTATUS(child_status));
