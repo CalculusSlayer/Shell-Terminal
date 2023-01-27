@@ -18,9 +18,9 @@ void freeList(List *pL); // Frees a list.
 
 // Access Functions
 int length(List L); // Get length of list
-int index(List L); // Get index of cursor
-ListElement front(List L); // Get front of list
-ListElement back(List L); // Get back of list
+int getIndex(List L); // Get index of cursor
+ListElement listFront(List L); // Get front of list
+ListElement listBack(List L); // Get back of list
 ListElement get(List L); // Get value at cursor
 
 // Manipulation Procedures

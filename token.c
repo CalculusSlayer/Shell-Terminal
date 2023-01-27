@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include "sshell.h"
 #include "token.h"
@@ -327,10 +328,10 @@ int* sshell_system_pipe(Process *processes, int num_processes)
 }
 
 
-int sshell_system(Process p, bool background_job) {
-    // If NULL process is passed, return 0
+void sshell_system(Process p, bool  background_job, char* cmd_msg) {
+    // If NULL process is passed, return None
     if (!p) {
-        return 0;
+        return;
     }
 
     pid_t child_pid;
@@ -389,10 +390,14 @@ int sshell_system(Process p, bool background_job) {
     else if (child_pid > 0) {
         int child_status;
         if (background_job) {
-            waitpid(child_pid, &child_status, WNOHANG);
+            printf("background_job = %d\n", background_job);
+            waitpid(-1, &child_status, WNOHANG);
+            fprintf(stderr, "+ completed '%s&' [%d]\n", cmd_msg, WEXITSTATUS(child_status));
+
         }
         else {
             waitpid(child_pid, &child_status, 0);
+            fprintf(stderr, "+ completed '%s' [%d]\n", cmd_msg, WEXITSTATUS(child_status));
         }
         // Printing to stderr instead of stdout now. Instructions
         // said to print to stderr.
@@ -413,7 +418,10 @@ int sshell_system(Process p, bool background_job) {
 
         //TODO: DECIDE WHETHER TO FREE PROCESS IN MAIN OR HERE!!!
         //free_process(&p);
-        return WEXITSTATUS(child_status);
+        
+        //TODO: DONT NEED THIS ANYMORE SINCE FUNCTION IS VOID TYPE?
+        //return WEXITSTATUS(child_status);
+        return;
     }
 
     else {

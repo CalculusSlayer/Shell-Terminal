@@ -159,11 +159,13 @@ int main(void)
             // Never Mind - Call sshell_system_pipe() function
             // if pipe count > 0
             /* Regular commands */
-            int ret_val = sshell_system(processes[0], background_job);
+            sshell_system(processes[0], background_job, cmd);
+            /*
             if (background_job)
                 fprintf(stderr, "+ completed '%s&' [%d]\n", cmd, ret_val); 
             else
                 fprintf(stderr, "+ completed '%s' [%d]\n", cmd, ret_val); 
+            */
 
             deallocator(&pipe_strings);
             for (int i=0; i < 4; i++) {

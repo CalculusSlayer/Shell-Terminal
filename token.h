@@ -12,6 +12,8 @@ typedef enum File_Operator {
 
 typedef struct ProcessObj* Process;
 
+// Included in .h file to make
+// getting attributes much easier
 typedef struct ProcessObj {
     char *program;
     File_Operator FO_type;
@@ -59,5 +61,5 @@ Process split_redirection(char* cmd);
 
 int* sshell_system_pipe(Process *processes, int num_processes);
 
-int sshell_system(Process p, bool background_job); 
+void sshell_system(Process p, bool background_job, char* cmd_msg); 
 

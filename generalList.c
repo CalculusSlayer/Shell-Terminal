@@ -20,12 +20,12 @@ typedef struct gNodeObj {
 // private ListObj type
 // This is a List structure
 typedef struct ListObj {
-	Node front;
-	Node back;
+	gNode front;
+	gNode back;
 	int length;
 	int index;
-	Node cursor;
-} gListObj;
+	gNode cursor;
+} ListObj;
 
 // Constructors-Destructors
 // Creates and returns new node.
@@ -40,7 +40,7 @@ gNode new_gNode(ListElement data) {
 
 // Free the node and set it to NULL.
 // Pre: pointer not NULL
-void free_gNode(Node *pN) {
+void free_gNode(gNode *pN) {
 	if (pN != NULL && *pN != NULL) {
 		free(*pN);
 		*pN = NULL;
@@ -81,20 +81,20 @@ int length(List L) {
 
 // Return the index of the cursor of List
 // Pre: Not NULL
-int index(List L) {
+int getIndex(List L) {
 	if (L) {
 		return L->index;
 	}
 
 	else {
-		fprintf(stderr, "Error: called index on NULL reference.\n");
+		fprintf(stderr, "Error: called getIndex() on NULL reference.\n");
 		exit(EXIT_FAILURE);
 	}
 }
 
 // Return the value at the front of list
 // Pre: not NULL
-ListElement front(List L) {
+ListElement listFront(List L) {
 	if (!L) {
 		fprintf(stderr, "Cannot call front on a NULL reference.\n");
 		exit(EXIT_FAILURE);
@@ -111,7 +111,7 @@ ListElement front(List L) {
 
 // Returns the value of the value at the back of list.
 // Pre: not NULL
-ListElement back(List L) {
+ListElement listBack(List L) {
 	if (!L) {
 		fprintf(stderr, "Cannot call back on a NULL reference.\n");
 		exit(EXIT_FAILURE);
@@ -140,7 +140,7 @@ ListElement get(List L) {
 		freeList(&L);
 		exit(EXIT_FAILURE);
 	}
-	else if (index(L) < 0) {
+	else if (getIndex(L) < 0) {
 		fprintf(stderr, "The index is not greater or equal to 0.\n");
 		freeList(&L);
 		exit(EXIT_FAILURE);
