@@ -66,12 +66,14 @@ int main(void)
 
         //char **cmd_args = splitter(cmd);
         //Process testProcess = split_redirection(cmd);
+
         StringArray pipe_strings = split_pipes(cmd);
+        int *pipe_exit_status;
         Process processes[4] = { NULL, NULL, NULL, NULL };
         for (int i = 0; i < 4; i++) {
             processes[i] = split_redirection(pipe_strings->arr[i]);
-        }        
-        
+        }
+
         // If parsing error was detected, then command line
         // and go to next iteration.
         if (parsing_error_detected) {
@@ -81,6 +83,25 @@ int main(void)
             }
             continue;
         }
+        int num_processes = 1;
+        for (int i = 1; i < 4; i++) {
+            if (processes[i] == NULL) {
+                break;
+            }
+            num_processes++;
+        }
+        if (num_processes > 1)
+        {
+            pipe_exit_status = sshell_system_pipe(processes, num_processes);
+            fprintf(stderr, "+ completed '%s' ", cmd);
+            for (int i = 0; i < num_processes; i++) {
+                printf("[%d]", pipe_exit_status[i]);
+            }
+            printf("\n");
+            break;
+        }
+        
+
 
         /* Builtin command */
         if (!strcmp(processes[0]->program, "exit")) {

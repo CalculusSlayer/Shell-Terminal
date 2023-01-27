@@ -5,11 +5,11 @@ CFLAGS += -g
 #CFLAGS += -O2
 EXEC1 = sshell
 DEPENDENCIES = token.o linked_list.o
-HEADERS = token.h linked_list.h sshell.h
+HEADERS = token.h linked_list.h sshell.h 
 
 all: $(EXEC1) token_test linked_list_test
 
-$(EXEC1): $(EXEC1).o $(DEPENDENCIES)
+$(EXEC1): $(EXEC1).o $(DEPENDENCIES) 
 	gcc $(CFLAGS) -o $(EXEC1) $(EXEC1).o $(DEPENDENCIES)
 
 $(EXEC1).o: $(EXEC1).c $(HEADERS)

@@ -231,6 +231,102 @@ void deallocator(StringArray* SA) {
     */
 }
 
+int* sshell_system_pipe(Process *processes, int num_processes) 
+{
+    //printf("In function sshell_system_pipe: \n");
+    int num_pipes = num_processes - 1;
+    int pipe_FDs[num_pipes * 2];
+    //int process_count = 0;
+    int status;
+    pid_t pid;
+
+    static int pipe_exit_status[4];
+    
+    /* Linked List of program name strings */
+    LinkedList commands = newLinkedList();
+    for (int nodes = 0; nodes < num_processes; nodes++)
+    {
+        appendRight(commands, processes[nodes]->program);
+    }
+    
+    int *process_count1 = malloc(sizeof(int));
+    *process_count1 = 0;
+
+    /* Create all necessary pipes (n - 1) */
+    for (int pipe_number = 0; pipe_number < num_pipes; pipe_number++) {
+        if (pipe(pipe_FDs + pipe_number * 2) < 0) {
+           perror("sshell_system_pipe() failed: pipe()\n");
+           exit(1);
+        }
+    }
+    
+
+    while (getLength(commands) > 0) {
+
+        pid = fork();
+        if (pid == 0) {
+            //printf("%d\n", *process_count1);
+            /* Child  process */
+            // Piping process taken from lecture slides 3 : syscalls
+
+            // If not the first process, replace stdin with pipe read port
+            if (*process_count1 != 0) {
+                if (dup2(pipe_FDs[*process_count1 * 2 - 2], 0) < 0) {
+                    perror("sshell_system_pipe() failed 1: dup2");
+                    exit(1);
+                }
+            }
+            // If not the last process, replace stdout with pipe write port
+            if (*process_count1 != num_pipes) {
+                if (dup2(pipe_FDs[*process_count1 * 2 + 1], 1) < 0) {
+                    perror("sshell_system_pipe() failed 2: dup2");
+                    exit(1);
+                }
+            }
+
+            // Close now unused pipes
+            for (int pipe_port = 0; pipe_port < num_pipes * 2; pipe_port++) {
+                close(pipe_FDs[pipe_port]);
+            }
+
+            // Execute commands given by process objects
+            char *prog_name = front(commands);
+            char **execvp_arguments = ll_to_str_arr(processes[*process_count1]->left_args, prog_name);
+            if (execvp(prog_name, execvp_arguments) < 0) {
+                    perror("sshell_system_pipe() failed: execvp");
+                    exit(1);
+            }
+
+        }    
+        else if (pid < 0) {
+            /* Fork failure */
+            perror("sshell_system_pipe failed: fork()\n");
+            exit(1);
+        }  
+        /* 
+            Parent creates all child processes through fork(), 
+            closes all of its file descriptors because it doesn't 
+            use them, and then waits for each of the children to exit
+        */
+
+        popLeft(commands);
+        (*process_count1)++;
+        
+    }
+    for (int i = 0; i < num_pipes * 2; i++) {
+        close(pipe_FDs[i]);
+    }
+    for (int exit_status_index = 0; exit_status_index < num_processes; exit_status_index++) {
+        wait(&status);
+        pipe_exit_status[exit_status_index] = status;
+    }
+
+    freeLinkedList(&commands);
+    return pipe_exit_status;
+
+}
+
+
 int sshell_system(Process p, bool background_job) {
     // If NULL process is passed, return 0
     if (!p) {
