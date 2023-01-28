@@ -12,7 +12,7 @@ structure we called “Process”, which contains fields like string
 user entered command, 
 
 
-###### Ex 1: [echo Hello World]
+**Ex 1: [echo Hello World]**
 
 
 we break the string down at space characters (‘ ‘) and create a 
@@ -24,7 +24,7 @@ process object that contains “program name” ‘echo’ and “arguments”
 with pipes (‘|’),
 
 
-##### Ex 2: [echo Hello World | grep Hello | wc -l]
+**[echo Hello World | grep Hello | wc -l]**
 
 
 we first break the string where pipes are found, leaving us with 
@@ -58,7 +58,7 @@ from beginning to end. As a final example for a third type of
 string, given a string with redirection operators ‘>’ or ‘>>’:
 
 
-##### Ex 3: [echo Hello World > output.txt]
+**Ex 3: [echo Hello World > output.txt]**
 
 
 the program considers everything to the left and right of the 
@@ -118,7 +118,7 @@ resets to stage one and requests new user input. The function
 
 more process objects indicates that pipes were found when breaking
 
-down the string(see Ex 2) and is handled by ```shell_system_pipe```
+down the string(Ex 2) and is handled by ```shell_system_pipe()```
 
 .In this case, we need to run the processes concurrently as a
 
@@ -156,7 +156,8 @@ extensively throughout the project.
 
 ### References:
 _______________
-Lecture slides  
+Lecture slides 
+[General C programming](https://stackoverflow.com/)
 [Linux man pages](https://linux.die.net/man/) 
 [Professor’s Markdown cheetsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) 
  
