@@ -39,9 +39,10 @@ linked_list_test: linked_list_test.o linked_list.o
 	$(CC) $(CFLAGS) -o $@ $^
 
 generalList_test: generalList_test.o $(DEPENDENCIES)
+	$(CC) $(CFLAGS) -o $@ $^
 
 # $< refers to first prereq (right side)
-%.o : %.c $(HEADERS)
+%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $<
 
 .PHONY: clean
