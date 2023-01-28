@@ -12,9 +12,7 @@ structure we called “Process”, which contains fields like string
 user entered command, 
 
 
-
-Ex 1: [echo Hello World]
-
+###### Ex 1: [echo Hello World]
 
 
 , we break the string down at space characters (‘ ‘) and create a 
@@ -26,9 +24,7 @@ process object that contains “program name” ‘echo’ and “arguments”
 As another example, given a complex string with pipes (‘|’),
 
 
-
-Ex 2: [echo Hello World | grep Hello | wc -l]
-
+##### Ex 2: [echo Hello World | grep Hello | wc -l]
 
 
 , we first break the string where pipes are found, leaving us with  
@@ -64,9 +60,7 @@ As a final example for a third type of string, given a string with
 either redirection operators ‘>’ or ‘>>’:
 
 
-
-Ex 3: [echo Hello World > output.txt]
-
+##### Ex 3: [echo Hello World > output.txt]
 
 
 , the program considers everything to the left and right of the 
@@ -87,7 +81,6 @@ into the “sshell”, our program can be separated into two main
 stages: reacting to input and running the executed command. 
 
 
-
 #### Stage one: input validation and parsing  
 ____________________________________________
 In the first stage, assuming valid input, a user entered string is 
@@ -98,15 +91,16 @@ stored for running commands in the future.  Given an invalid input
 
 string, the program requests new input and restarts from stage 1. 
 
+
 #### Stage 2: Running desired commands  
 ______________________________________
-In the second stage, we can now execute the desired commands using   
+In the second stage, we can now execute the desired commands using  
 
-the “Process” objects. Stated earlier, one process object indicates  
+the “Process” objects. Stated earlier, one process object indicates 
 
 a single command and a single fork() operation. The child process  
 
-executes the command  contained in “Process” using execvp() and the  
+executes the command  contained in “Process” using execvp() and the 
 
 parent waits for the child process to end, after which the program  
 
@@ -153,8 +147,4 @@ _______________
 Lecture slides  
 [Linux man pages](https://linux.die.net/man/)  
 [Professor’s Markdown cheetsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)  
-  
-
-
-
-
+ 
