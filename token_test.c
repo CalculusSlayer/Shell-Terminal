@@ -56,7 +56,7 @@ int main() {
     }
     
     for (int i = 0; i < 4; i++) {
-        sshell_system(yy[i], 0);
+        sshell_system(yy[i], 0, newList(), "borus");
         free_process(&(yy[i]));
     }
 

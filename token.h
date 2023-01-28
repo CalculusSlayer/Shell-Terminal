@@ -25,6 +25,8 @@ typedef struct ProcessObj {
     LinkedList file_name;
     int exit_status; // For backgrounds jobs
     char *cmd_str; // For background jobs
+    pid_t process_id; // For piping
+    int process_index; // For piping
 } ProcessObj;
 
 typedef struct BackgroundJobObj {

@@ -5,7 +5,7 @@
 #
 # Makefile
 #
-# make				makes sshell, token_test, and linked_list_test
+# make				makes sshell
 # make sshell			makes sshell
 # make token_test		makes token_test
 # make linked_list_test		makes linked_list_test
@@ -25,15 +25,12 @@ CFLAGS += -g
 HEADERS = $(wildcard *.h)
 DEPENDENCIES = token.o linked_list.o generalList.o
 
-.PHONY: all
-all: sshell token_test linked_list_test generalList_test
-
 # $@ refers to target name (left side)
 # $^ refers to ALL the prereqs (right side)
 sshell: sshell.o $(DEPENDENCIES) 
 	$(CC) $(CFLAGS) -o $@ $^
 
-token_test: token_test.o token.o linked_list.o
+token_test: token_test.o $(DEPENDENCIES)
 	$(CC) $(CFLAGS) -o $@ $^ 
 
 linked_list_test: linked_list_test.o linked_list.o
