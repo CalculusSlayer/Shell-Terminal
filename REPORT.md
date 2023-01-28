@@ -2,7 +2,7 @@
 # By Nayeel Imtiaz and Ky Ngo
 
 ### Process object: What and why?
-_________________________________
+====================================
 Before diving into the details, our project implements an important 
 
 structure we called “Process”, which contains fields like string 
@@ -24,7 +24,7 @@ process object that contains “program name” ‘echo’ and “arguments”
 with pipes (‘|’),
 
 
-**[echo Hello World | grep Hello | wc -l]**
+**Ex 2:[echo Hello World | grep Hello | wc -l]**
 
 
 we first break the string where pipes are found, leaving us with 
@@ -71,7 +71,7 @@ strings to the right of the redirection operator.
 
 
 ### Our project: A description 
-______________________________
+==============================
 With this “Process” object in mind, upon receiving an input string
 
 into the “sshell”, our program can be separated into two main 
@@ -80,7 +80,7 @@ stages: reacting to input and running the executed command.
 
 
 #### Stage one: input validation and parsing 
-____________________________________________
+================================================
 In the first stage, assuming valid input, a user entered string is 
 
 broken down into as many “Process” objects as necessary, which are 
@@ -101,7 +101,7 @@ redirection operators using the steps in Ex 3, and creates
 
 
 #### Stage 2: Running desired commands
-______________________________________
+====================================
 In the second stage, we can now execute the desired commands using
 
 the “Process” objects. Stated earlier, one process object indicates 
@@ -138,7 +138,7 @@ detection in stage 1.
 
 
 ### Testing:
-____________
+============
 + Our first priority was to pass the tester.sh file provided to us,
 
 so we fixed errors in accordance to test cases that did not pass. 
@@ -155,9 +155,13 @@ extensively throughout the project.
 
 
 ### References:
-_______________
+==================
 Lecture slides 
+
 [General C programming](https://stackoverflow.com/)
+
 [Linux man pages](https://linux.die.net/man/) 
-[Professor’s Markdown cheetsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) 
+
+[Professor’s Markdown cheetsheet](https://github.com/adam-p/
+markdown-here/wiki/Markdown-Cheatsheet) 
  
