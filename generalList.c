@@ -1,7 +1,18 @@
-#include "generalList.h"
-// This is a general queue
+//--------------------------------------------------
+// Nayeel Imtiaz
+// Ky Ngo
+//
+// generalList.h -
+// This is a header file
+// for the representation
+// of a general Linked List
 // that can support all
-// object types.
+// object types. We use it in
+// our program as a double ended
+// queue.
+// _________________________________________________
+
+#include "generalList.h"
 
 // structs
 

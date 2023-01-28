@@ -9,6 +9,7 @@
 # make sshell			makes sshell
 # make token_test		makes token_test
 # make linked_list_test		makes linked_list_test
+# make generalList_test		makes generalList_test
 # make clean			Removes all objects files and executables
 #---------------------------------------------------------------------
 
