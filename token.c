@@ -9,7 +9,6 @@
 #include "token.h"
 #include "linked_list.h"
 
-const int MAX_ARGUMENTS = 16;
 Process pipes[4];
 
 Process new_process() {
@@ -19,6 +18,8 @@ Process new_process() {
     //p->background_job = false;
     p->left_args = NULL;
     p->file_name = NULL;
+    //p->exit_status = 70;
+    //p->cmd_str = strdup("bogus");
 
     return p;
 }
@@ -30,6 +31,10 @@ void free_process(Process* p) {
         if ((*p)->program) {
             free((*p)->program);
             (*p)->program = NULL;
+        }
+        if ((*p)->cmd_str) {
+            free((*p)->cmd_str);
+            (*p)->cmd_str = NULL;
         }
         free(*p);
         p = NULL;
@@ -328,10 +333,10 @@ int* sshell_system_pipe(Process *processes, int num_processes)
 }
 
 
-void sshell_system(Process p, bool  background_job, char* cmd_msg) {
+int sshell_system(Process p, bool background_job_flag, List background_jobs, char* cmd_msg) {
     // If NULL process is passed, return None
     if (!p) {
-        return;
+        return 0;
     }
 
     pid_t child_pid;
@@ -365,7 +370,7 @@ void sshell_system(Process p, bool  background_job, char* cmd_msg) {
                 close(f1);
             }
 
-            else if (!(p->left_args) || getLength(p->left_args)==0) {
+            else if (!(p->program)) {
                 fprintf(stderr, "sshell_system(), token.c: There is no argument(s) before %s\n",
                         arrow);
             }
@@ -389,15 +394,22 @@ void sshell_system(Process p, bool  background_job, char* cmd_msg) {
 
     else if (child_pid > 0) {
         int child_status;
-        if (background_job) {
-            printf("background_job = %d\n", background_job);
-            waitpid(-1, &child_status, WNOHANG);
-            fprintf(stderr, "+ completed '%s&' [%d]\n", cmd_msg, WEXITSTATUS(child_status));
+        if (background_job_flag) {
+            BackgroundJobObj* x = malloc(sizeof(BackgroundJobObj));
+            x->cmd_str = strdup(cmd_msg);
+            x->exit_status = 10;
+            x->pid = child_pid;
+            append(background_jobs, x);
+            //printf("cmd_str = %s\n", bg->cmd_str);
+            //printf("p inside sshell_system() = %lu\n", (unsigned long) bg);
+            //printf("background_job = %d\n", background_job);
+            waitpid(child_pid, &(x->exit_status), WNOHANG);
 
         }
         else {
             waitpid(child_pid, &child_status, 0);
-            fprintf(stderr, "+ completed '%s' [%d]\n", cmd_msg, WEXITSTATUS(child_status));
+            //fprintf(stderr, "+ completed '%s' [%d]\n", cmd_msg, WEXITSTATUS(child_status));
+            return WEXITSTATUS(child_status);
         }
         // Printing to stderr instead of stdout now. Instructions
         // said to print to stderr.
@@ -419,9 +431,8 @@ void sshell_system(Process p, bool  background_job, char* cmd_msg) {
         //TODO: DECIDE WHETHER TO FREE PROCESS IN MAIN OR HERE!!!
         //free_process(&p);
         
-        //TODO: DONT NEED THIS ANYMORE SINCE FUNCTION IS VOID TYPE?
         //return WEXITSTATUS(child_status);
-        return;
+        return 0; // TODO: check here
     }
 
     else {

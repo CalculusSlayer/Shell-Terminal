@@ -3,6 +3,8 @@
 #pragma once
 
 #include "linked_list.h"
+#include "generalList.h"
+#include "sshell.h"
 
 typedef enum File_Operator {
     NO_FILE_OPERATOR = 0,
@@ -21,7 +23,15 @@ typedef struct ProcessObj {
     // change type to linked list
     LinkedList left_args;
     LinkedList file_name;
+    int exit_status; // For backgrounds jobs
+    char *cmd_str; // For background jobs
 } ProcessObj;
+
+typedef struct BackgroundJobObj {
+    char *cmd_str;
+    int exit_status;
+    pid_t pid;
+} BackgroundJobObj;
 
 // StringArray type is a pointer to StringArrayObj
 // It will be used for storing char** with
@@ -61,5 +71,6 @@ Process split_redirection(char* cmd);
 
 int* sshell_system_pipe(Process *processes, int num_processes);
 
-void sshell_system(Process p, bool background_job, char* cmd_msg); 
+int sshell_system(Process p, bool background_job,
+        List background_jobs, char* cmd_msg); 
 

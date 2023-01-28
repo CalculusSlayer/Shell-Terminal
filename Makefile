@@ -25,20 +25,20 @@ HEADERS = $(wildcard *.h)
 DEPENDENCIES = token.o linked_list.o generalList.o
 
 .PHONY: all
-all: sshell token_test linked_list_test
+all: sshell token_test linked_list_test generalList_test
 
 # $@ refers to target name (left side)
 # $^ refers to ALL the prereqs (right side)
-sshell: $@.o $(DEPENDENCIES) 
+sshell: sshell.o $(DEPENDENCIES) 
 	$(CC) $(CFLAGS) -o $@ $^
 
-token_test: $@.o token.o linked_list.o
+token_test: token_test.o token.o linked_list.o
 	$(CC) $(CFLAGS) -o $@ $^ 
 
-linked_list_test: $@.o linked_list.o
+linked_list_test: linked_list_test.o linked_list.o
 	$(CC) $(CFLAGS) -o $@ $^
 
-generalLinkedList: $@.o $(DEPENDENCIES)
+generalList_test: generalList_test.o $(DEPENDENCIES)
 
 # $< refers to first prereq (right side)
 %.o : %.c $(HEADERS)
@@ -46,4 +46,4 @@ generalLinkedList: $@.o $(DEPENDENCIES)
 
 .PHONY: clean
 clean:
-	rm -f *.o sshell token_test linked_list_test
+	rm -f *.o sshell token_test linked_list_test generalList_test

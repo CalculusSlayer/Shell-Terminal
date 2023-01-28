@@ -10,7 +10,7 @@
 typedef void* ListElement; // Change this to change the type of List.
 
 // Exported type
-typedef struct ListObj *List; // Pointer to list object
+typedef struct ListObj* List; // Pointer to list object
 
 // Constructors/Destructors
 List newList (void); // Creates a new list.

@@ -6,10 +6,27 @@
 
 //Referenced slide deck 03(syscalls) for information regarding readdir();
 
+bool check_active_jobs(List background_jobs) {
+    moveFront(background_jobs);
+    bool active_jobs = false;
+    for (int i = 0; i < length(background_jobs); i++) {
+        // add this: waitpid(child_pid, &(x->exit_status), WNOHANG);
+        //printf("exit_status: %i\n", ((BackgroundJobObj*)get(background_jobs))->exit_status);
+        // fflush(stdout);
+        BackgroundJobObj* x = (BackgroundJobObj*)get(background_jobs);
+        if (waitpid(x->pid, &(x->exit_status), WNOHANG)==0) {
+            active_jobs = true;
+            break;
+        }
+        moveNext(background_jobs);
+    }
+    return active_jobs;
+}
+
 int main(void)
 {       
     /* Child process, run sshell until user exit */
-
+    List background_jobs = newList();
     char cmd[CMDLINE_MAX];
     char current_directory[100];
     DIR *dirp;
@@ -17,7 +34,7 @@ int main(void)
     while (1) {
         char *nl; 
         bool full_spaces = true;
-        bool background_job = false;
+        bool background_job_flag = false;
         bool parsing_error_detected = false;
         //int retval;
 
@@ -33,23 +50,18 @@ int main(void)
             if (cmd[i] == '\n') break;
             else if (cmd[i] != ' ') {
                 full_spaces = false;
-                if (background_job) {
+                if (background_job_flag) {
                     fprintf(stderr, "Error: mislocated background sign\n");
                     parsing_error_detected = true;
 
                 }
             }
             if (cmd[i] == '&') {
-                background_job = true;
+                background_job_flag = true;
             }
         }
 
         if (full_spaces) continue;
-        if (background_job) {
-            char* ambersand_needle = strstr(cmd, "&");
-            size_t ambersand_index = ambersand_needle - cmd;
-            cmd[ambersand_index] = '\0';
-        }
 
         /* Print command line if stdin is not provided by terminal */
         if (!isatty(STDIN_FILENO)) {
@@ -64,6 +76,11 @@ int main(void)
             *nl = '\0';
        
 
+        if (background_job_flag) {
+            char* ambersand_needle = strstr(cmd, "&");
+            size_t ambersand_index = ambersand_needle - cmd;
+            cmd[ambersand_index] = '\0';
+        }
         //char **cmd_args = splitter(cmd);
         //Process testProcess = split_redirection(cmd);
 
@@ -105,13 +122,25 @@ int main(void)
 
         /* Builtin command */
         if (!strcmp(processes[0]->program, "exit")) {
-            fprintf(stderr, "Bye...\n");
-            fprintf(stderr, "+ completed '%s' [%d]\n", "exit", 0);
+            bool c = check_active_jobs(background_jobs);
+            if (c) {
+                fprintf(stderr, "Error: active jobs still running\n");
+                fprintf(stderr, "+ completed '%s' [%d]\n", "exit", 1);
+                fflush(stderr);
+            }
+            else {
+                fprintf(stderr, "Bye...\n");
+                fprintf(stderr, "+ completed '%s' [%d]\n", "exit", 0);
+                fflush(stderr);
+            }
             deallocator(&pipe_strings);
             for (int i=0; i < 4; i++) {
                 free_process(&processes[i]);
             }
-            break;
+            if (!c)
+                break;
+            else
+                continue;
         }
         //TODO: Debug pwd. It is failing test.sh.
         else if (!strcmp(processes[0]->program, "pwd")) {
@@ -119,6 +148,7 @@ int main(void)
             getcwd(current_directory, sizeof(current_directory));
             printf("%s\n", current_directory);         
             fprintf(stderr, "+ completed '%s' [%d]\n", "pwd", 0);
+            fflush(stderr);
             deallocator(&pipe_strings);
             for (int i=0; i < 4; i++) {
                 free_process(&processes[i]);
@@ -134,8 +164,10 @@ int main(void)
                     chdir(front(processes[0]->left_args));
                     directory_not_found = 0;
                 }
-                else
+                else {
                     fprintf(stderr, "Error: cannot cd into directory\n");
+                    fflush(stderr);
+                }
                 
                 //fprintf(stderr, "+ completed '%s %s' [%d]\n", processes[0]->program, processes[0]->left_args, directory_not_found);
                 closedir(dirp);
@@ -145,6 +177,7 @@ int main(void)
                 fprintf(stderr, "+ completed '%s ", processes[0]->program);
                 printLinkedList(stderr, processes[0]->left_args);
                 fprintf(stderr, "' [%d]\n", directory_not_found);         
+                fflush(stderr);
 
             }
             deallocator(&pipe_strings);
@@ -159,7 +192,28 @@ int main(void)
             // Never Mind - Call sshell_system_pipe() function
             // if pipe count > 0
             /* Regular commands */
-            sshell_system(processes[0], background_job, cmd);
+            //printf("processes[0] in main file: %lu\n", (unsigned long) processes[0]);
+            int ret_val = sshell_system(processes[0]
+                    , background_job_flag, background_jobs, cmd);
+//            fprintf(stderr, "cmd = %s\n", 
+            if (!background_job_flag) {
+                if (background_jobs && length(background_jobs)>0) {
+                    
+                    while (check_active_jobs(background_jobs));
+                    moveFront(background_jobs);
+                    for (int i = 0; i < length(background_jobs); i++) {
+                        fprintf(stderr, "+ completed '%s&' [%d]\n", 
+                            ((BackgroundJobObj*)get(background_jobs))->cmd_str,
+                            ((BackgroundJobObj*)get(background_jobs))->exit_status); 
+                        fflush(stderr);
+                        moveNext(background_jobs);
+                    }
+                    clear(background_jobs);
+
+                }
+                fprintf(stderr, "+ completed '%s' [%d]\n", cmd, ret_val); 
+                fflush(stderr);
+            }
             /*
             if (background_job)
                 fprintf(stderr, "+ completed '%s&' [%d]\n", cmd, ret_val); 
