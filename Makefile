@@ -1,37 +1,49 @@
+#--------------------------------------------------------------------
+# Nayeel Imtiaz
+# Ky Ngo
+# ECS 150, Project 1
+#
 # Makefile
+#
+# make				makes sshell, token_test, and linked_list_test
+# make sshell			makes sshell
+# make token_test		makes token_test
+# make linked_list_test		makes linked_list_test
+# make clean			Removes all objects files and executables
+#---------------------------------------------------------------------
 
+CC = gcc
 CFLAGS = -Wall -Wextra -Wextra
+
+# Uncomment Line below to add debug flag
 CFLAGS += -g
+
+# Uncomment line below to add compilation optimization flag
 #CFLAGS += -O2
-EXEC1 = sshell
-DEPENDENCIES = token.o linked_list.o
-HEADERS = token.h linked_list.h sshell.h 
 
-all: $(EXEC1) token_test linked_list_test
+HEADERS = $(wildcard *.h)
+DEPENDENCIES = token.o linked_list.o generalList.o
 
-$(EXEC1): $(EXEC1).o $(DEPENDENCIES) 
-	gcc $(CFLAGS) -o $(EXEC1) $(EXEC1).o $(DEPENDENCIES)
+.PHONY: all
+all: sshell token_test linked_list_test generalList_test
 
-$(EXEC1).o: $(EXEC1).c $(HEADERS)
-	gcc $(CFLAGS) -c $(EXEC1).c 
-
-token.o: token.c token.h $(HEADERS)
-	gcc $(CFLAGS) -c token.c
+# $@ refers to target name (left side)
+# $^ refers to ALL the prereqs (right side)
+sshell: sshell.o $(DEPENDENCIES) 
+	$(CC) $(CFLAGS) -o $@ $^
 
 token_test: token_test.o token.o linked_list.o
-	gcc $(CFLAGS) -o token_test token_test.o token.o linked_list.o
-
-token_test.o: token_test.c $(HEADERS)
-	gcc $(CFLAGS) -c token_test.c
+	$(CC) $(CFLAGS) -o $@ $^ 
 
 linked_list_test: linked_list_test.o linked_list.o
-	gcc $(CFLAGS) -o linked_list_test linked_list_test.o linked_list.o
+	$(CC) $(CFLAGS) -o $@ $^
 
-linked_list_test.o: linked_list_test.c $(HEADERS)
-	gcc $(CFLAGS) -c linked_list_test.c
+generalList_test: generalList_test.o $(DEPENDENCIES)
 
-linked_list.o: linked_list.c $(HEADERS)
-	gcc $(CFLAGS) -c linked_list.c
+# $< refers to first prereq (right side)
+%.o : %.c $(HEADERS)
+	$(CC) $(CFLAGS) -c $<
 
+.PHONY: clean
 clean:
-	rm -f *.o $(EXEC1) token_test linked_list_test
+	rm -f *.o sshell token_test linked_list_test generalList_test
