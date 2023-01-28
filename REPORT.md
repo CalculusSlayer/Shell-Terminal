@@ -169,6 +169,5 @@ Lecture slides
 
 [Linux man pages](https://linux.die.net/man/) 
 
-[Professor’s Markdown cheetsheet](https://github.com/adam-p/
-markdown-here/wiki/Markdown-Cheatsheet) 
+[Professor’s Markdown cheetsheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet) 
  
