@@ -3,7 +3,7 @@
 
 ### Process object: What and why?
 _________________________________
-Before diving into the details, our project implements an important 
++ Before diving into the details, our project implements an important 
 
 structure we called “Process”, which contains fields like string 
 
@@ -15,19 +15,19 @@ user entered command,
 ###### Ex 1: [echo Hello World]
 
 
-, we break the string down at space characters (‘ ‘) and create a 
++ we break the string down at space characters (‘ ‘) and create a 
 
 process object that contains “program name” ‘echo’ and “arguments” 
 
-‘Hello’ and ‘World’.
+‘Hello’ and ‘World’. As another example, given a complex string
 
-As another example, given a complex string with pipes (‘|’),
+with pipes (‘|’),
 
 
 ##### Ex 2: [echo Hello World | grep Hello | wc -l]
 
 
-, we first break the string where pipes are found, leaving us with  
++ we first break the string where pipes are found, leaving us with  
 
 three new individual strings. Each of these strings is then broken  
 
@@ -53,17 +53,15 @@ For more complex strings like the second example, we are able to
 
 perform piping concurrently versus if we had read the input string  
 
-from beginning to end.  
+from beginning to end. As a final example for a third type of
 
-As a final example for a third type of string, given a string with 
-
-either redirection operators ‘>’ or ‘>>’:
+string, given a string with redirection operators ‘>’ or ‘>>’:
 
 
 ##### Ex 3: [echo Hello World > output.txt]
 
 
-, the program considers everything to the left and right of the 
++ the program considers everything to the left and right of the 
 
 redirection operator to be one process. The "Process" object 
 
@@ -74,7 +72,7 @@ strings to the right of the redirection operator.
 
 ### Our project: A description  
 ______________________________
-With this “Process” object in mind, upon receiving an input string
++ With this “Process” object in mind, upon receiving an input string
 
 into the “sshell”, our program can be separated into two main 
 
@@ -83,7 +81,7 @@ stages: reacting to input and running the executed command.
 
 #### Stage one: input validation and parsing  
 ____________________________________________
-In the first stage, assuming valid input, a user entered string is 
++ In the first stage, assuming valid input, a user entered string is 
 
 broken down into as many “Process” objects as necessary, which are 
 
@@ -94,7 +92,7 @@ string, the program requests new input and restarts from stage 1.
 
 #### Stage 2: Running desired commands  
 ______________________________________
-In the second stage, we can now execute the desired commands using  
++ In the second stage, we can now execute the desired commands using  
 
 the “Process” objects. Stated earlier, one process object indicates 
 
@@ -127,7 +125,7 @@ detection in stage 1.
 
 ### Testing:  
 ____________
-Our first priority was to pass the tester.sh file provided to us,
++ Our first priority was to pass the tester.sh file provided to us,
 
 so  we fixed errors in accordance to test cases that did not pass.  
 
