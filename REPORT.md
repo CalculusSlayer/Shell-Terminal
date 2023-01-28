@@ -1,6 +1,13 @@
 # ECS 150 Shell Terminal Report
 # By Nayeel Imtiaz and Ky Ngo
 
+
+
+
+
+
+
+
 ## Process object: What and why?
 
 Before diving into the details, our project implements an important 
