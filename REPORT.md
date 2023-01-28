@@ -1,8 +1,8 @@
 # ECS 150 Shell Terminal Report
 # By Nayeel Imtiaz and Ky Ngo
 
-### Process object: What and why?
-====================================
+## Process object: What and why?
+
 Before diving into the details, our project implements an important 
 
 structure we called “Process”, which contains fields like string 
@@ -70,8 +70,8 @@ contains one additional field, a string "file name", that holds the
 strings to the right of the redirection operator.
 
 
-### Our project: A description 
-==============================
+## Our project: A description 
+
 With this “Process” object in mind, upon receiving an input string
 
 into the “sshell”, our program can be separated into two main 
@@ -80,7 +80,7 @@ stages: reacting to input and running the executed command.
 
 
 #### Stage one: input validation and parsing 
-================================================
+
 In the first stage, assuming valid input, a user entered string is 
 
 broken down into as many “Process” objects as necessary, which are 
@@ -101,7 +101,7 @@ redirection operators using the steps in Ex 3, and creates
 
 
 #### Stage 2: Running desired commands
-====================================
+
 In the second stage, we can now execute the desired commands using
 
 the “Process” objects. Stated earlier, one process object indicates 
@@ -137,8 +137,8 @@ creation of “Process” objects and are simply executed upon
 detection in stage 1. 
 
 
-### Testing:
-============
+## Testing:
+
 + Our first priority was to pass the tester.sh file provided to us,
 
 so we fixed errors in accordance to test cases that did not pass. 
@@ -154,8 +154,8 @@ memory leaks because we used allocated memory and used pointers
 extensively throughout the project.
 
 
-### References:
-==================
+## References:
+
 Lecture slides 
 
 [General C programming](https://stackoverflow.com/)
