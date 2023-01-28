@@ -140,7 +140,7 @@ memory leaks because we used allocated memory and used pointers
 extensively throughout the project.
 
 
-### References:  
+### References:
 _______________
 Lecture slides  
 [Linux man pages](https://linux.die.net/man/)  
