@@ -12,7 +12,10 @@ structure we called “Process”, which contains fields like string
 user entered command, 
 
 
+
 Ex 1: [echo Hello World]
+
+
 
 , we break the string down at space characters (‘ ‘) and create a 
 
@@ -23,7 +26,10 @@ process object that contains “program name” ‘echo’ and “arguments”
 As another example, given a complex string with pipes (‘|’),
 
 
+
 Ex 2: [echo Hello World | grep Hello | wc -l]
+
+
 
 , we first break the string where pipes are found, leaving us with  
 
@@ -57,7 +63,11 @@ As a final example for a third type of string, given a string with
 
 either redirection operators ‘>’ or ‘>>’:
 
+
+
 Ex 3: [echo Hello World > output.txt]
+
+
 
 , the program considers everything to the left and right of the 
 
