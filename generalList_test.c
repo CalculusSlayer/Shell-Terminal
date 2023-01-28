@@ -5,7 +5,7 @@
 #include "sshell.h"
 
 
-int print_process(Process p) {
+void print_process(Process p) {
     printf("program: %s", p->program);
     printf("FO_type: %d", p->FO_type);
 
@@ -16,6 +16,7 @@ int print_process(Process p) {
     printf("file_name = ");
     printLinkedList(stdout, p->file_name);
     printf("\n");
+
 }
 
 int main(void) {

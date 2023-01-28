@@ -219,6 +219,7 @@ int* sshell_system_pipe(Process *processes, int num_processes)
     for (int nodes = 0; nodes < num_processes; nodes++)
     {
         appendRight(commands, processes[nodes]->program);
+        processes[nodes]->process_index = nodes;
     }
     
     int *process_count1 = malloc(sizeof(int));
@@ -236,6 +237,8 @@ int* sshell_system_pipe(Process *processes, int num_processes)
     while (getLength(commands) > 0) {
 
         pid = fork();
+        processes[num_processes - getLength(commands)]->process_id 
+            = pid;
         if (pid == 0) {
             //printf("%d\n", *process_count1);
             /* Child  process */
@@ -288,10 +291,380 @@ int* sshell_system_pipe(Process *processes, int num_processes)
     for (int i = 0; i < num_pipes * 2; i++) {
         close(pipe_FDs[i]);
     }
-    for (int exit_status_index = 0; exit_status_index < num_processes; exit_status_index++) {
-        wait(&status);
-        pipe_exit_status[exit_status_index] = status;
+   
+    if (num_processes > 2) {
+        for (int exit_status_index = 0; exit_status_index < num_processes; exit_status_index++) {
+            //wait(&status);
+            wait(&status);
+            pipe_exit_status[exit_status_index] = WEXITSTATUS(status);
+        }
     }
+
+    /*
+    if (num_processes == 4) {
+        while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[3]->process_id, &status, WNOHANG)==0);
+        if (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[3]->process_id, &status, WNOHANG)!=0) {
+            pipe_exit_status[3] = WEXITSTATUS(status);
+
+            while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                    waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                    waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+            if (waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+
+                pipe_exit_status[0] = WEXITSTATUS(status);
+                while (waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                        waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                if (waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                    while (waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                }
+                else if (waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                    while (waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                }
+            }
+
+            else if (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+
+                pipe_exit_status[1] = WEXITSTATUS(status);
+                while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                        waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                if (waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[0] = WEXITSTATUS(status);
+                    while (waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                }
+                else if (waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                    while (waitpid(processes[0]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[0] = WEXITSTATUS(status);
+                }
+            }
+
+            else if (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+
+                pipe_exit_status[2] = WEXITSTATUS(status);
+                while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                        waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+                if (waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[0] = WEXITSTATUS(status);
+                    while (waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                }
+                else if (waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                    while (waitpid(processes[0]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[0] = WEXITSTATUS(status);
+                }
+            }
+        }
+
+        else if (waitpid(processes[3]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+            pipe_exit_status[0] = WEXITSTATUS(status);
+
+            while (waitpid(processes[3]->process_id, &status, WNOHANG)==0 &&
+                    waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                    waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+            if (waitpid(processes[3]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+
+                pipe_exit_status[1] = WEXITSTATUS(status);
+                while (waitpid(processes[3]->process_id, &status, WNOHANG)==0 &&
+                        waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                if (waitpid(processes[3]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[3] = WEXITSTATUS(status);
+                    while (waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                }
+                else if (waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                    while (waitpid(processes[3]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[3] = WEXITSTATUS(status);
+                }
+            }
+
+            else if (waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[3]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+
+                pipe_exit_status[2] = WEXITSTATUS(status);
+                while (waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                        waitpid(processes[3]->process_id, &status, WNOHANG)==0);
+                if (waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                    while (waitpid(processes[3]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[3] = WEXITSTATUS(status);
+                }
+                else if (waitpid(processes[3]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[3] = WEXITSTATUS(status);
+                    while (waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                }
+            }
+
+            else if (waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[3]->process_id, &status, WNOHANG)!=0) {
+
+                pipe_exit_status[3] = WEXITSTATUS(status);
+                while (waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                        waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                if (waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                    while (waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                }
+                else if (waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                    while (waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                }
+            }
+        }
+
+        else if (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[3]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+            pipe_exit_status[1] = WEXITSTATUS(status);
+
+            while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                    waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+                    waitpid(processes[3]->process_id, &status, WNOHANG)==0);
+            if (waitpid(processes[3]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+
+                pipe_exit_status[0] = WEXITSTATUS(status);
+                while (waitpid(processes[3]->process_id, &status, WNOHANG)==0 &&
+                        waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                if (waitpid(processes[3]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[3] = WEXITSTATUS(status);
+                    while (waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                }
+                else if (waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                    while (waitpid(processes[3]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[3] = WEXITSTATUS(status);
+                }
+            }
+
+            else if (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[3]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+
+                pipe_exit_status[2] = WEXITSTATUS(status);
+                while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                        waitpid(processes[3]->process_id, &status, WNOHANG)==0);
+                if (waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[0] = WEXITSTATUS(status);
+                    while (waitpid(processes[3]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[3] = WEXITSTATUS(status);
+                }
+                else if (waitpid(processes[3]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[3] = WEXITSTATUS(status);
+                    while (waitpid(processes[0]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[0] = WEXITSTATUS(status);
+                }
+            }
+
+            else if (waitpid(processe[1]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[3]->process_id, &status, WNOHANG)!=0) {
+
+                pipe_exit_status[3] = WEXITSTATUS(status);
+                while (waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                        waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                if (waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                    while (waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                }
+                else if (waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                    while (waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                }
+            }
+        }
+
+        else if (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[3]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+            pipe_exit_status[2] = WEXITSTATUS(status);
+
+            while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                    waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                    waitpid(processes[3]->process_id, &status, WNOHANG)==0);
+            if (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[3]->process_id, &status, WNOHANG)!=0) {
+
+                pipe_exit_status[3] = WEXITSTATUS(status);
+                while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                        waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+                if (waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[0] = WEXITSTATUS(status);
+                    while (waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                }
+                else if (waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                    while (waitpid(processes[0]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[0] = WEXITSTATUS(status);
+                }
+            }
+
+            else if (waitpid(processes[3]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+
+                pipe_exit_status[1] = WEXITSTATUS(status);
+                while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                        waitpid(processes[3]->process_id, &status, WNOHANG)==0);
+                if (waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[0] = WEXITSTATUS(status);
+                    while (waitpid(processes[3]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[3] = WEXITSTATUS(status);
+                }
+                else if (waitpid(processes[3]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[3] = WEXITSTATUS(status);
+                    while (waitpid(processes[0]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[0] = WEXITSTATUS(status);
+                }
+            }
+
+            else if (waitpid(processe[1]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[3]->process_id, &status, WNOHANG)!=0) {
+
+                pipe_exit_status[3] = WEXITSTATUS(status);
+                while (waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                        waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                if (waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                    while (waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                }
+                else if (waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+                    pipe_exit_status[2] = WEXITSTATUS(status);
+                    while (waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+                    pipe_exit_status[1] = WEXITSTATUS(status);
+                }
+            }
+        }
+    }
+
+
+
+    else if (num_processes == 3) {
+        while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+        if (waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+            
+            pipe_exit_status[0] = WEXITSTATUS(status);
+            while (waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+                    waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+            if (waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+                pipe_exit_status[1] = WEXITSTATUS(status);
+                while (waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                pipe_exit_status[2] = WEXITSTATUS(status);
+            }
+            else if (waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+                pipe_exit_status[2] = WEXITSTATUS(status);
+                while (waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+                pipe_exit_status[1] = WEXITSTATUS(status);
+            }
+        }
+        
+        else if (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[2]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+
+            pipe_exit_status[1] = WEXITSTATUS(status);
+            while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                    waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+            if (waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+                pipe_exit_status[0] = WEXITSTATUS(status);
+                while (waitpid(processes[2]->process_id, &status, WNOHANG)==0);
+                pipe_exit_status[2] = WEXITSTATUS(status);
+            }
+            else if (waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+                pipe_exit_status[2] = WEXITSTATUS(status);
+                while (waitpid(processes[0]->process_id, &status, WNOHANG)==0);
+                pipe_exit_status[0] = WEXITSTATUS(status);
+            }
+        }
+
+        else if (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[1]->process_id, &status, WNOHANG)==0 &&
+            waitpid(processes[2]->process_id, &status, WNOHANG)!=0) {
+
+            pipe_exit_status[2] = WEXITSTATUS(status);
+            while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                    waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+            if (waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+                pipe_exit_status[0] = WEXITSTATUS(status);
+                while (waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+                pipe_exit_status[1] = WEXITSTATUS(status);
+            }
+            else if (waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+                pipe_exit_status[1] = WEXITSTATUS(status);
+                while (waitpid(processes[0]->process_id, &status, WNOHANG)==0);
+                pipe_exit_status[0] = WEXITSTATUS(status);
+            }
+        }
+
+    }
+    */
+
+    else if (num_processes == 2) {
+        while (waitpid(processes[0]->process_id, &status, WNOHANG)==0 &&
+                waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+        if (waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+            pipe_exit_status[0] = WEXITSTATUS(status);
+            while (waitpid(processes[1]->process_id, &status, WNOHANG)==0);
+            pipe_exit_status[1] = WEXITSTATUS(status);
+        }
+        
+        else if (waitpid(processes[1]->process_id, &status, WNOHANG)!=0) {
+            pipe_exit_status[1] = WEXITSTATUS(status);
+            while (waitpid(processes[0]->process_id, &status, WNOHANG)==0);
+            pipe_exit_status[0] = WEXITSTATUS(status);
+        }
+    }
+       /*
+        {
+            if (waitpid(processes[0]->process_id, &status, WNOHANG)!=0) {
+                pipe_exit_status[0] = WEXITSTATUS(status);
+                while (waitpid(processes[1]->process_id, &status, WNOHANG)==0) {
+                    pipe
+            }
+        }
+        */
 
     freeLinkedList(&commands);
     return pipe_exit_status;
