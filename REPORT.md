@@ -125,9 +125,9 @@ resets to stage one and requests new user input. The function
 
 more process objects indicates that pipes were found when breaking
 
-down the string(Ex 2) and is handled by ```shell_system_pipe()```
+down the string(Ex 2) and is handled by ```shell_system_pipe()```.
 
-.In this case, we need to run the processes concurrently as a
+In this case, we need to run the processes concurrently as a
 
 regular shell would. This is done by forking as many times as there 
 
@@ -146,7 +146,7 @@ detection in stage 1.
 
 ## Testing:
 
-+ Our first priority was to pass the tester.sh file provided to us,
+Our first priority was to pass the tester.sh file provided to us,
 
 so we fixed errors in accordance to test cases that did not pass. 
 
