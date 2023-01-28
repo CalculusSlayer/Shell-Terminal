@@ -36,6 +36,8 @@ int main(void)
         bool full_spaces = true;
         bool background_job_flag = false;
         bool parsing_error_detected = false;
+        bool ambersand_error = false;
+
         //int retval;
 
         /* Print prompt */
@@ -49,30 +51,16 @@ int main(void)
         for (int i = 0; i < CMDLINE_MAX; i++) {
             if (cmd[i] == '\n') break;
             else if (background_job_flag
-                    && full_spaces) {
-
-            if (cmd[i] == '&') {
+                    && cmd[i] != ' ') {
+                ambersand_error = true;
+            }
+            else if (cmd[i] == '&') {
                 background_job_flag = true;
-                full_space = false;
+                full_spaces = false;
             }
             else if (cmd[i] != ' ') {
                 full_spaces = false;
             }
-     
-
-            /*
-                if (background_job_flag) {
-                    fprintf(stderr, "Error: mislocated background sign\n");
-                    parsing_error_detected = true;
-
-                }
-            */
-            /*
-             * do this somewhere else
-            if (cmd[i] == '&') {
-                background_job_flag = true;
-            }
-            */ 
         }
 
         /* Print command line if stdin is not provided by terminal */
@@ -83,6 +71,12 @@ int main(void)
 
 
         if (full_spaces) continue;
+
+        if (ambersand_error) {
+            fprintf(stderr, "Error: mislocated background sign\n");
+            continue;
+        }
+            
 
         /* Remove trailing newline from command line */
         nl = strchr(cmd, '\n');
@@ -140,8 +134,10 @@ int main(void)
             for (int i=0; i < 4; i++) {
                 free_process(&processes[i]);
             }
-            if (!c)
+            if (!c) {
+                freeList(&background_jobs);
                 break;
+            }
             else
                 continue;
         }
