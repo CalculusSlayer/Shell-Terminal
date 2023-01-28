@@ -48,20 +48,32 @@ int main(void)
         
         for (int i = 0; i < CMDLINE_MAX; i++) {
             if (cmd[i] == '\n') break;
+            else if (background_job_flag
+                    && full_spaces) {
+
+            if (cmd[i] == '&') {
+                background_job_flag = true;
+                full_space = false;
+            }
             else if (cmd[i] != ' ') {
                 full_spaces = false;
+            }
+     
+
+            /*
                 if (background_job_flag) {
                     fprintf(stderr, "Error: mislocated background sign\n");
                     parsing_error_detected = true;
 
                 }
-            }
+            */
+            /*
+             * do this somewhere else
             if (cmd[i] == '&') {
                 background_job_flag = true;
             }
+            */ 
         }
-
-        if (full_spaces) continue;
 
         /* Print command line if stdin is not provided by terminal */
         if (!isatty(STDIN_FILENO)) {
@@ -70,13 +82,15 @@ int main(void)
         }
 
 
+        if (full_spaces) continue;
+
         /* Remove trailing newline from command line */
         nl = strchr(cmd, '\n');
         if (nl)
             *nl = '\0';
        
-
         if (background_job_flag) {
+
             char* ambersand_needle = strstr(cmd, "&");
             size_t ambersand_index = ambersand_needle - cmd;
             cmd[ambersand_index] = '\0';
@@ -107,18 +121,7 @@ int main(void)
             }
             num_processes++;
         }
-        if (num_processes > 1)
-        {
-            pipe_exit_status = sshell_system_pipe(processes, num_processes);
-            fprintf(stderr, "+ completed '%s' ", cmd);
-            for (int i = 0; i < num_processes; i++) {
-                printf("[%d]", pipe_exit_status[i]);
-            }
-            printf("\n");
-            break;
-        }
         
-
 
         /* Builtin command */
         if (!strcmp(processes[0]->program, "exit")) {
@@ -186,6 +189,18 @@ int main(void)
             }
             continue;
         }
+
+        else if (num_processes > 1)
+        {
+            pipe_exit_status = sshell_system_pipe(processes, num_processes);
+            fprintf(stderr, "+ completed '%s' ", cmd);
+            for (int i = 0; i < num_processes; i++) {
+                printf("[%d]", pipe_exit_status[i]);
+            }
+            printf("\n");
+            continue;
+        }
+
         else {
             // TODO: HAVE A LOOP TO CALL SSHELL_SYSTEM
             // UP TO 4 TIMES
