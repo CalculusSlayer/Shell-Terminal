@@ -32,10 +32,6 @@ void free_process(Process* p) {
             free((*p)->program);
             (*p)->program = NULL;
         }
-        if ((*p)->cmd_str) {
-            free((*p)->cmd_str);
-            (*p)->cmd_str = NULL;
-        }
         free(*p);
         p = NULL;
     }
@@ -158,50 +154,20 @@ Process split_redirection(char *cmd) {
         p->left_args = str_to_ll(cmd);
         //printf("LOOK BELOW\n");
         //printLinkedList(stdout, p->left_args);
-        p->program = strdup(front(p->left_args));
+        if (p->left_args && getLength(p->left_args) > 0) {
+            p->program = strdup(front(p->left_args));
+            popLeft(p->left_args);
+        }
+        else {
+            p->program = NULL;
+        }
         //printf("In token.c: p->program = %s\n", p->program);
-        popLeft(p->left_args);
     }
 
     return p;
 
 }
 
-/*
-char **splitter(char *buf) {
-    char **cmd_args = calloc(MAX_ARGUMENTS, sizeof(char*));
-    char *buf_copy = strdup(buf);    
-    // Need to make copy of buf
-    char *token = NULL;
-    const char delimiter[] = " ";
-
-    token = strtok(buf_copy, delimiter);
-*/
-
-    /*
-    while (token != NULL) {
-        printf("%s\n", token);
-        test[token]
-        token = strtok(NULL, delimiter);
-    }
-    */
-
-/*
-    for (int cmd_args_index=0; token != NULL;
-            cmd_args_index++) {
-        //printf("%s\n", token);
-        //If more than 16 valid 
-        if (cmd_args_index == MAX_ARGUMENTS) {
-            free(buf_copy);
-            return NULL;
-        }
-        cmd_args[cmd_args_index] = strdup(token);
-        token = strtok(0, delimiter);
-    }
-    free(buf_copy);
-    return cmd_args;
-}
-*/
 
 // Replaced char*** with StringArray
 void deallocator(StringArray* SA) {
@@ -387,7 +353,8 @@ int sshell_system(Process p, bool background_job_flag, List background_jobs, cha
         StringArray cmd_args = new_StringArray(
                 ll_to_str_arr(p->left_args, p->program), getLength(p->left_args)+2);
         execvp(p->program, cmd_args->arr);
-        perror("execv");
+        //perror("execv");
+        fprintf(stderr, "Error: command not found\n");
         deallocator(&cmd_args);
         exit(1);
     }

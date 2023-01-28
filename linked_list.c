@@ -185,7 +185,7 @@ char** ll_to_str_arr(LinkedList L, char* prog_name) {
 }
 
 LinkedList str_to_ll(char* str) {
-    if (!str)
+    if (!str || strlen(str)==0)
         return NULL;
     char *str_copy = strdup(str);
     // Need to make copy of buf
