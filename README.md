@@ -42,7 +42,7 @@ The shell supports more advanced features like output redirection, piping, and b
 
 - Redirect output to a file. For example: `ls > file.txt`
 - Pipe two commands. For example: `ls | grep keyword`
-- Run a command in the background by prepend `&`. For example: `&sleep(5)`
+- Run a command in the background by prepending `&`. For example: `&sleep(5)`
 
 ### Error Handling
 If you enter an invalid command, the shell will provide a user-friendly error message.
